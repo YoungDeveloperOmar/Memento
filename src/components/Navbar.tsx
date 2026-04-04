@@ -2,16 +2,19 @@ import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useMemento } from "@/context/MementoContext";
+import { resolveDashboardPath } from "@/lib/memento-api";
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { currentRole, signOut } = useMemento();
 
   const links = [
     { to: "/", label: "Home" },
     { to: "/download", label: "Download" },
-    { to: "/patient-dashboard", label: "Patient Portal" },
-    { to: "/caregiver-dashboard", label: "Caregiver Portal" },
+    { to: "/privacy-policy", label: "Privacy" },
+    { to: "/accessibility", label: "Accessibility" },
   ];
 
   return (
@@ -37,12 +40,30 @@ const Navbar = () => {
         </div>
 
         <div className="hidden md:flex items-center gap-3">
-          <Button variant="ghost" size="lg" asChild>
-            <Link to="/auth">Sign In</Link>
-          </Button>
-          <Button size="lg" asChild>
-            <Link to="/auth?mode=signup">Get Started</Link>
-          </Button>
+          {currentRole ? (
+            <>
+              <Button variant="ghost" size="lg" asChild>
+                <Link to={resolveDashboardPath(currentRole)}>Dashboard</Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={signOut}
+                type="button"
+              >
+                Sign Out
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="ghost" size="lg" asChild>
+                <Link to="/auth">Sign In</Link>
+              </Button>
+              <Button size="lg" asChild>
+                <Link to="/auth?mode=signup">Get Started</Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <button
@@ -67,12 +88,34 @@ const Navbar = () => {
             </Link>
           ))}
           <div className="mt-4 flex flex-col gap-3">
-            <Button variant="outline" size="lg" asChild>
-              <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
-            </Button>
-            <Button size="lg" asChild>
-              <Link to="/auth?mode=signup" onClick={() => setIsOpen(false)}>Get Started</Link>
-            </Button>
+            {currentRole ? (
+              <>
+                <Button variant="outline" size="lg" asChild>
+                  <Link to={resolveDashboardPath(currentRole)} onClick={() => setIsOpen(false)}>
+                    Dashboard
+                  </Link>
+                </Button>
+                <Button
+                  size="lg"
+                  onClick={() => {
+                    signOut();
+                    setIsOpen(false);
+                  }}
+                  type="button"
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="outline" size="lg" asChild>
+                  <Link to="/auth" onClick={() => setIsOpen(false)}>Sign In</Link>
+                </Button>
+                <Button size="lg" asChild>
+                  <Link to="/auth?mode=signup" onClick={() => setIsOpen(false)}>Get Started</Link>
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}

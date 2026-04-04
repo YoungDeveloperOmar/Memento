@@ -1,10 +1,25 @@
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import Layout from "@/components/Layout";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useMemento } from "@/context/MementoContext";
+import { toast } from "@/hooks/use-toast";
 import {
   Pill, Mic, CalendarClock, FileText, ShieldAlert, MapPin,
   UserPlus, Settings2, Bell, Heart, Users, ArrowRight,
-  Smartphone, Monitor, Mail, ChevronRight, Clock, Phone
+  Smartphone, Mail, ChevronRight, Clock, Phone
 } from "lucide-react";
 import heroImage from "@/assets/hero-illustration.jpg";
 import familyImage from "@/assets/family-connection.jpg";
@@ -32,16 +47,59 @@ const profiles = [
 ];
 
 const portalCards = [
-  { icon: Clock, title: "Today's Routine", desc: "Morning walk, lunch, afternoon rest" },
-  { icon: Pill, title: "Medication Reminder", desc: "Take Aspirin at 2:00 PM" },
-  { icon: Mic, title: "AI Voice Prompt", desc: "'Good morning! Ready for your day?'" },
-  { icon: MapPin, title: "Important Places", desc: "Home, Pharmacy, Park" },
-  { icon: Phone, title: "Emergency Contacts", desc: "Sarah (daughter), Dr. Smith" },
-  { icon: FileText, title: "Daily Summary", desc: "3 tasks done, 1 reminder left" },
+  { icon: Clock, title: "Today's Routine", desc: "See meals, appointments, and check-ins for the day at a glance." },
+  { icon: Pill, title: "Medication Reminder", desc: "Track upcoming doses and confirm each medication safely." },
+  { icon: Mic, title: "Voice Guidance", desc: "Replay care prompts and spoken reminders when reassurance helps." },
+  { icon: MapPin, title: "Care Team Access", desc: "Keep key contacts and support details one tap away." },
+  { icon: Phone, title: "Emergency Response", desc: "Send a fast alert to the right people when help is needed." },
+  { icon: FileText, title: "Daily Summary", desc: "Review completed tasks, pending reminders, and care notes." },
 ];
 
-const Index = () => (
-  <Layout>
+const contactSchema = z.object({
+  name: z.string().trim().min(2, "Enter your name."),
+  email: z.string().email("Enter a valid email address."),
+  message: z
+    .string()
+    .trim()
+    .min(10, "Tell us a bit more so we can help.")
+    .max(1000, "Please keep the message under 1000 characters."),
+});
+
+type ContactFormData = z.infer<typeof contactSchema>;
+
+const Index = () => {
+  const { submitSupportRequest } = useMemento();
+  const contactForm = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      message: "",
+    },
+  });
+
+  const onSubmit = contactForm.handleSubmit(async (values) => {
+    try {
+      await submitSupportRequest(values);
+      toast({
+        title: "Message sent",
+        description: "Your support request has been received.",
+      });
+      contactForm.reset();
+    } catch (error) {
+      toast({
+        title: "Unable to send message",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Your message could not be sent right now.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  return (
+    <Layout>
     {/* Hero */}
     <section className="py-16 md:py-24 px-4">
       <div className="container mx-auto grid md:grid-cols-2 gap-12 items-center">
@@ -188,20 +246,19 @@ const Index = () => (
       <div className="container mx-auto text-center space-y-12">
         <div className="space-y-4">
           <h2 className="text-section-sm md:text-section">Download Memento</h2>
-          <p className="text-body-lg text-muted-foreground">Available on mobile and desktop. Take Memento wherever you go.</p>
+          <p className="text-body-lg text-muted-foreground">
+            The mobile app is on the roadmap. Until then, the full web app is
+            available today.
+          </p>
         </div>
-        <div className="grid md:grid-cols-2 gap-8 max-w-2xl mx-auto">
+          <div className="mx-auto max-w-xl">
           <div className="bg-card rounded-2xl p-10 shadow-sm border space-y-4">
             <Smartphone className="w-12 h-12 text-primary mx-auto" />
             <h3 className="text-xl font-heading font-semibold">Mobile App</h3>
-            <p className="text-muted-foreground">For iOS and Android</p>
-            <Button size="lg" className="w-full text-lg py-6">Download Mobile</Button>
-          </div>
-          <div className="bg-card rounded-2xl p-10 shadow-sm border space-y-4">
-            <Monitor className="w-12 h-12 text-primary mx-auto" />
-            <h3 className="text-xl font-heading font-semibold">Desktop App</h3>
-            <p className="text-muted-foreground">For Windows and macOS</p>
-            <Button size="lg" variant="outline" className="w-full text-lg py-6">Download Desktop</Button>
+            <p className="text-muted-foreground">Planned for iOS and Android</p>
+            <Button size="lg" className="w-full text-lg py-6" asChild>
+              <Link to="/download">View Mobile Availability</Link>
+            </Button>
           </div>
         </div>
       </div>
@@ -238,30 +295,80 @@ const Index = () => (
         <div className="bg-card rounded-2xl p-8 md:p-12 shadow-sm border space-y-6">
           <div className="flex items-center gap-3 text-lg text-muted-foreground">
             <Mail className="w-6 h-6 text-primary" />
-            <span>support@memento.app</span>
+            <span>Use the secure support form below and the care team will follow up.</span>
           </div>
-          <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
-            <div>
-              <label htmlFor="name" className="block text-lg font-medium mb-2">Your Name</label>
-              <input id="name" type="text" className="w-full rounded-xl border bg-background px-5 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your name" />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-lg font-medium mb-2">Email Address</label>
-              <input id="email" type="email" className="w-full rounded-xl border bg-background px-5 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your email" />
-            </div>
-            <div>
-              <label htmlFor="message" className="block text-lg font-medium mb-2">Message</label>
-              <textarea id="message" rows={4} className="w-full rounded-xl border bg-background px-5 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-primary resize-none" placeholder="How can we help?" />
-            </div>
-            <Button size="lg" className="w-full text-lg py-6">Send Message</Button>
-          </form>
+          <Form {...contactForm}>
+            <form className="space-y-5" onSubmit={onSubmit}>
+              <FormField
+                control={contactForm.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="h-12 rounded-xl"
+                        placeholder="Enter your name"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={contactForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email Address</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        className="h-12 rounded-xl"
+                        placeholder="name@example.com"
+                        type="email"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={contactForm.control}
+                name="message"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Message</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        className="min-h-[140px] rounded-xl px-4 py-3 text-base"
+                        placeholder="How can we help you or your care team?"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button
+                size="lg"
+                className="w-full py-6 text-lg"
+                disabled={contactForm.formState.isSubmitting}
+                type="submit"
+              >
+                {contactForm.formState.isSubmitting ? "Sending..." : "Send Message"}
+              </Button>
+            </form>
+          </Form>
           <p className="text-center text-muted-foreground text-sm">
             Memento is designed with accessibility and family support at its core. We're here for you.
           </p>
         </div>
       </div>
     </section>
-  </Layout>
-);
+    </Layout>
+  );
+};
 
 export default Index;

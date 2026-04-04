@@ -1,82 +1,424 @@
 import { useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Heart, KeyRound, ShieldPlus, UserRound } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
-import { Heart, User, Users } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useMemento } from "@/context/MementoContext";
+import { resolveDashboardPath } from "@/lib/memento-api";
+import { toast } from "@/hooks/use-toast";
+
+const passwordSchema = z
+  .string()
+  .min(8, "Password must be at least 8 characters long.")
+  .regex(/[A-Z]/, "Password must include an uppercase letter.")
+  .regex(/[a-z]/, "Password must include a lowercase letter.")
+  .regex(/\d/, "Password must include a number.");
+
+const caregiverSignInSchema = z.object({
+  email: z.string().email("Enter a valid email address."),
+  password: passwordSchema,
+});
+
+const caregiverSignUpSchema = caregiverSignInSchema.extend({
+  fullName: z.string().trim().min(2, "Enter your full name."),
+});
+
+const patientSignInSchema = z.object({
+  patientLoginId: z
+    .string()
+    .trim()
+    .min(6, "Enter the patient ID given by the caregiver."),
+});
+
+type CaregiverSignInValues = z.infer<typeof caregiverSignInSchema>;
+type CaregiverSignUpValues = z.infer<typeof caregiverSignUpSchema>;
+type PatientSignInValues = z.infer<typeof patientSignInSchema>;
 
 const Auth = () => {
-  const [searchParams] = useSearchParams();
-  const [isSignUp, setIsSignUp] = useState(searchParams.get("mode") === "signup");
-  const [role, setRole] = useState<"patient" | "caregiver">("patient");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { currentRole, isHydrating, caregiverSignIn, caregiverSignUp, patientSignIn } =
+    useMemento();
+  const [role, setRole] = useState<"caregiver" | "patient">("caregiver");
+  const isCaregiverSignUp =
+    role === "caregiver" && searchParams.get("mode") === "signup";
+
+  const caregiverSignInForm = useForm<CaregiverSignInValues>({
+    resolver: zodResolver(caregiverSignInSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const caregiverSignUpForm = useForm<CaregiverSignUpValues>({
+    resolver: zodResolver(caregiverSignUpSchema),
+    defaultValues: {
+      fullName: "",
+      email: "",
+      password: "",
+    },
+  });
+
+  const patientSignInForm = useForm<PatientSignInValues>({
+    resolver: zodResolver(patientSignInSchema),
+    defaultValues: {
+      patientLoginId: "",
+    },
+  });
+
+  if (currentRole && !isHydrating) {
+    return <Navigate to={resolveDashboardPath(currentRole)} replace />;
+  }
+
+  const handleCaregiverSignIn = caregiverSignInForm.handleSubmit(async (values) => {
+    try {
+      await caregiverSignIn(values);
+      toast({
+        title: "Signed in",
+        description: "Your caregiver dashboard is ready.",
+      });
+      navigate("/caregiver-dashboard", { replace: true });
+    } catch (error) {
+      toast({
+        title: "Unable to sign in",
+        description:
+          error instanceof Error ? error.message : "Caregiver login failed.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handleCaregiverSignUp = caregiverSignUpForm.handleSubmit(async (values) => {
+    try {
+      await caregiverSignUp(values);
+      toast({
+        title: "Account created",
+        description:
+          "Your caregiver account is ready. You can add patients from the dashboard.",
+      });
+      navigate("/caregiver-dashboard", { replace: true });
+    } catch (error) {
+      toast({
+        title: "Unable to create account",
+        description:
+          error instanceof Error ? error.message : "Caregiver registration failed.",
+        variant: "destructive",
+      });
+    }
+  });
+
+  const handlePatientSignIn = patientSignInForm.handleSubmit(async (values) => {
+    try {
+      await patientSignIn({
+        patientLoginId: values.patientLoginId.trim().toUpperCase(),
+      });
+      toast({
+        title: "Signed in",
+        description: "Your patient dashboard is ready.",
+      });
+      navigate("/patient-dashboard", { replace: true });
+    } catch (error) {
+      toast({
+        title: "Unable to sign in",
+        description:
+          error instanceof Error ? error.message : "Patient login failed.",
+        variant: "destructive",
+      });
+    }
+  });
 
   return (
     <Layout>
-      <section className="py-16 md:py-24 px-4">
-        <div className="container mx-auto max-w-md">
-          <div className="text-center space-y-3 mb-10">
-            <Heart className="w-10 h-10 text-primary mx-auto fill-primary" />
-            <h1 className="text-section-sm md:text-section font-heading">
-              {isSignUp ? "Create Your Account" : "Welcome Back"}
-            </h1>
-            <p className="text-muted-foreground text-lg">
-              {isSignUp ? "Join Memento and start your journey." : "Sign in to your Memento account."}
-            </p>
-          </div>
+      <section className="px-4 py-16 md:py-24">
+        <div className="container mx-auto max-w-4xl">
+          <div className="grid gap-8 lg:grid-cols-[1fr_1.15fr]">
+            <div className="rounded-3xl bg-secondary/60 p-8">
+              <Heart className="mb-6 h-11 w-11 fill-primary text-primary" />
+              <h1 className="font-heading text-section-sm md:text-section">
+                Secure access for caregivers and patients
+              </h1>
+              <p className="mt-4 text-body-lg text-muted-foreground">
+                Caregivers manage patient records with email and password. Patients
+                use a unique ID generated by their caregiver, with no password
+                required.
+              </p>
 
-          <div className="bg-card rounded-2xl p-8 md:p-10 shadow-sm border space-y-6">
-            {isSignUp && (
-              <div className="space-y-3">
-                <label className="block text-lg font-medium">I am a...</label>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    onClick={() => setRole("patient")}
-                    className={`flex flex-col items-center gap-2 p-5 rounded-xl border-2 transition-all ${
-                      role === "patient" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
-                    }`}
-                  >
-                    <User className="w-8 h-8 text-primary" />
-                    <span className="text-lg font-medium">Patient</span>
-                  </button>
-                  <button
-                    onClick={() => setRole("caregiver")}
-                    className={`flex flex-col items-center gap-2 p-5 rounded-xl border-2 transition-all ${
-                      role === "caregiver" ? "border-primary bg-primary/5" : "border-border hover:border-primary/40"
-                    }`}
-                  >
-                    <Users className="w-8 h-8 text-primary" />
-                    <span className="text-lg font-medium">Caregiver</span>
-                  </button>
+              <div className="mt-8 space-y-4">
+                <div className="rounded-2xl border bg-card p-5">
+                  <div className="flex items-center gap-3">
+                    <ShieldPlus className="h-6 w-6 text-primary" />
+                    <div className="font-semibold">Caregiver Access</div>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Create an account, add one or more patients, manage support
+                    profiles, and keep routines, medications, and emergency contacts
+                    in sync.
+                  </p>
+                </div>
+
+                <div className="rounded-2xl border bg-card p-5">
+                  <div className="flex items-center gap-3">
+                    <KeyRound className="h-6 w-6 text-primary" />
+                    <div className="font-semibold">Patient Access</div>
+                  </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Patients sign in with their caregiver-issued patient ID and can
+                    review routines, talk to the assistant, add daily tasks, and save
+                    their day summary.
+                  </p>
                 </div>
               </div>
-            )}
+            </div>
 
-            {isSignUp && (
-              <div>
-                <label htmlFor="fullname" className="block text-lg font-medium mb-2">Full Name</label>
-                <input id="fullname" type="text" className="w-full rounded-xl border bg-background px-5 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your full name" />
+            <div className="rounded-3xl border bg-card p-8 shadow-sm md:p-10">
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole("caregiver")}
+                  className={`rounded-2xl border-2 p-4 text-left transition-colors ${
+                    role === "caregiver"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <ShieldPlus className="mb-2 h-6 w-6 text-primary" />
+                  <div className="font-semibold">Caregiver</div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Email and password access
+                  </p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRole("patient")}
+                  className={`rounded-2xl border-2 p-4 text-left transition-colors ${
+                    role === "patient"
+                      ? "border-primary bg-primary/5"
+                      : "border-border hover:border-primary/40"
+                  }`}
+                >
+                  <UserRound className="mb-2 h-6 w-6 text-primary" />
+                  <div className="font-semibold">Patient</div>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    Patient ID only
+                  </p>
+                </button>
               </div>
-            )}
 
-            <div>
-              <label htmlFor="email" className="block text-lg font-medium mb-2">Email Address</label>
-              <input id="email" type="email" className="w-full rounded-xl border bg-background px-5 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your email" />
+              {role === "caregiver" ? (
+                <div className="mt-8">
+                  <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                      <h2 className="text-2xl font-bold">
+                        {isCaregiverSignUp
+                          ? "Create caregiver account"
+                          : "Caregiver sign in"}
+                      </h2>
+                      <p className="text-muted-foreground">
+                        {isCaregiverSignUp
+                          ? "You can add patients after the account is created."
+                          : "Sign in to manage linked patient profiles."}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="text-sm font-semibold text-primary hover:underline"
+                      onClick={() =>
+                        setSearchParams(isCaregiverSignUp ? {} : { mode: "signup" })
+                      }
+                    >
+                      {isCaregiverSignUp
+                        ? "Already have an account?"
+                        : "Need an account?"}
+                    </button>
+                  </div>
+
+                  {isCaregiverSignUp ? (
+                    <form className="space-y-5" onSubmit={handleCaregiverSignUp}>
+                      <div className="space-y-2">
+                        <label
+                          className="text-sm font-medium"
+                          htmlFor="caregiver-signup-full-name"
+                        >
+                          Full Name
+                        </label>
+                        <Input
+                          id="caregiver-signup-full-name"
+                          className="h-12 rounded-xl"
+                          placeholder="Enter your full name"
+                          autoComplete="name"
+                          {...caregiverSignUpForm.register("fullName")}
+                        />
+                        {caregiverSignUpForm.formState.errors.fullName ? (
+                          <p className="text-sm font-medium text-destructive">
+                            {caregiverSignUpForm.formState.errors.fullName.message}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label
+                          className="text-sm font-medium"
+                          htmlFor="caregiver-signup-email"
+                        >
+                          Email Address
+                        </label>
+                        <Input
+                          id="caregiver-signup-email"
+                          className="h-12 rounded-xl"
+                          placeholder="name@example.com"
+                          type="email"
+                          autoComplete="email"
+                          {...caregiverSignUpForm.register("email")}
+                        />
+                        {caregiverSignUpForm.formState.errors.email ? (
+                          <p className="text-sm font-medium text-destructive">
+                            {caregiverSignUpForm.formState.errors.email.message}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label
+                          className="text-sm font-medium"
+                          htmlFor="caregiver-signup-password"
+                        >
+                          Password
+                        </label>
+                        <Input
+                          id="caregiver-signup-password"
+                          className="h-12 rounded-xl"
+                          placeholder="Create a secure password"
+                          type="password"
+                          autoComplete="new-password"
+                          {...caregiverSignUpForm.register("password")}
+                        />
+                        {caregiverSignUpForm.formState.errors.password ? (
+                          <p className="text-sm font-medium text-destructive">
+                            {caregiverSignUpForm.formState.errors.password.message}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <Button
+                        className="w-full py-6 text-lg"
+                        size="lg"
+                        type="submit"
+                        disabled={caregiverSignUpForm.formState.isSubmitting}
+                      >
+                        {caregiverSignUpForm.formState.isSubmitting
+                          ? "Creating..."
+                          : "Create Caregiver Account"}
+                      </Button>
+                    </form>
+                  ) : (
+                    <form className="space-y-5" onSubmit={handleCaregiverSignIn}>
+                      <div className="space-y-2">
+                        <label
+                          className="text-sm font-medium"
+                          htmlFor="caregiver-signin-email"
+                        >
+                          Email Address
+                        </label>
+                        <Input
+                          id="caregiver-signin-email"
+                          className="h-12 rounded-xl"
+                          placeholder="name@example.com"
+                          type="email"
+                          autoComplete="email"
+                          {...caregiverSignInForm.register("email")}
+                        />
+                        {caregiverSignInForm.formState.errors.email ? (
+                          <p className="text-sm font-medium text-destructive">
+                            {caregiverSignInForm.formState.errors.email.message}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <div className="space-y-2">
+                        <label
+                          className="text-sm font-medium"
+                          htmlFor="caregiver-signin-password"
+                        >
+                          Password
+                        </label>
+                        <Input
+                          id="caregiver-signin-password"
+                          className="h-12 rounded-xl"
+                          placeholder="Enter your password"
+                          type="password"
+                          autoComplete="current-password"
+                          {...caregiverSignInForm.register("password")}
+                        />
+                        {caregiverSignInForm.formState.errors.password ? (
+                          <p className="text-sm font-medium text-destructive">
+                            {caregiverSignInForm.formState.errors.password.message}
+                          </p>
+                        ) : null}
+                      </div>
+
+                      <Button
+                        className="w-full py-6 text-lg"
+                        size="lg"
+                        type="submit"
+                        disabled={caregiverSignInForm.formState.isSubmitting}
+                      >
+                        {caregiverSignInForm.formState.isSubmitting
+                          ? "Signing In..."
+                          : "Sign In"}
+                      </Button>
+                    </form>
+                  )}
+                </div>
+              ) : (
+                <div className="mt-8">
+                  <div className="mb-6">
+                    <h2 className="text-2xl font-bold">Patient sign in</h2>
+                    <p className="text-muted-foreground">
+                      Patients do not create accounts here. Use the ID supplied by the
+                      caregiver.
+                    </p>
+                  </div>
+
+                  <form className="space-y-5" onSubmit={handlePatientSignIn}>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium" htmlFor="patient-signin-id">
+                        Patient ID
+                      </label>
+                      <Input
+                        id="patient-signin-id"
+                        autoCapitalize="characters"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        className="h-12 rounded-xl uppercase"
+                        placeholder="MEM-XXXXXX"
+                        {...patientSignInForm.register("patientLoginId")}
+                      />
+                      {patientSignInForm.formState.errors.patientLoginId ? (
+                        <p className="text-sm font-medium text-destructive">
+                          {patientSignInForm.formState.errors.patientLoginId.message}
+                        </p>
+                      ) : null}
+                    </div>
+
+                    <Button
+                      className="w-full py-6 text-lg"
+                      size="lg"
+                      type="submit"
+                      disabled={patientSignInForm.formState.isSubmitting}
+                    >
+                      {patientSignInForm.formState.isSubmitting
+                        ? "Signing In..."
+                        : "Open Patient Dashboard"}
+                    </Button>
+                  </form>
+                </div>
+              )}
             </div>
-
-            <div>
-              <label htmlFor="password" className="block text-lg font-medium mb-2">Password</label>
-              <input id="password" type="password" className="w-full rounded-xl border bg-background px-5 py-4 text-lg focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Enter your password" />
-            </div>
-
-            <Button size="lg" className="w-full text-lg py-6">
-              {isSignUp ? "Create Account" : "Sign In"}
-            </Button>
-
-            <p className="text-center text-muted-foreground">
-              {isSignUp ? "Already have an account?" : "Don't have an account?"}{" "}
-              <button onClick={() => setIsSignUp(!isSignUp)} className="text-primary font-semibold hover:underline">
-                {isSignUp ? "Sign In" : "Sign Up"}
-              </button>
-            </p>
           </div>
         </div>
       </section>
