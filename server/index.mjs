@@ -14,6 +14,49 @@ const distDirectory = join(projectRoot, "dist");
 const isDevMode = process.argv.includes("--dev");
 const port = Number(process.env.PORT ?? 3001);
 
+const loadEnvFile = (filePath) => {
+  if (!existsSync(filePath)) {
+    return;
+  }
+
+  const fileContents = readFileSync(filePath, "utf8");
+
+  for (const rawLine of fileContents.split(/\r?\n/u)) {
+    const line = rawLine.trim();
+
+    if (!line || line.startsWith("#")) {
+      continue;
+    }
+
+    const separatorIndex = line.indexOf("=");
+
+    if (separatorIndex === -1) {
+      continue;
+    }
+
+    const key = line.slice(0, separatorIndex).trim();
+    const value = line
+      .slice(separatorIndex + 1)
+      .trim()
+      .replace(/^(['"])(.*)\1$/u, "$2");
+
+    const currentValue = process.env[key];
+
+    if (!key || (typeof currentValue === "string" && currentValue.trim())) {
+      continue;
+    }
+
+    process.env[key] = value;
+  }
+};
+
+loadEnvFile(join(projectRoot, ".env"));
+loadEnvFile(join(projectRoot, ".env.local"));
+
+const openAiApiKey = process.env.OPENAI_API_KEY?.trim() ?? "";
+const openAiBaseUrl = (process.env.OPENAI_BASE_URL?.trim() || "https://api.openai.com/v1").replace(/\/$/, "");
+const openAiModel = process.env.OPENAI_MODEL?.trim() || "gpt-5.4-mini";
+
 mkdirSync(dataDirectory, { recursive: true });
 
 const database = new DatabaseSync(databasePath);
@@ -94,6 +137,14 @@ database.exec(`
   );
 
   CREATE TABLE IF NOT EXISTS assistant_messages (
+    id TEXT PRIMARY KEY,
+    patient_id TEXT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    sender TEXT NOT NULL,
+    content TEXT NOT NULL,
+    created_at TEXT NOT NULL
+  );
+
+  CREATE TABLE IF NOT EXISTS care_note_messages (
     id TEXT PRIMARY KEY,
     patient_id TEXT NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
     sender TEXT NOT NULL,
@@ -238,6 +289,118 @@ const buildAssistantBrief = (name, dementiaClassification, profile) => {
 
   return segments.filter(Boolean).join(" ");
 };
+
+const buildPatientContext = (patientBundle) => {
+  const routineLines = patientBundle.routine.tasks.length
+    ? patientBundle.routine.tasks
+        .map((task) => `${task.title} at ${task.scheduledTime}${task.description ? ` (${task.description})` : ""}`)
+        .join("; ")
+    : "No routine tasks are currently scheduled.";
+
+  const medicationLines = patientBundle.medications.length
+    ? patientBundle.medications
+        .map(
+          (medication) =>
+            `${medication.name} ${medication.dosage} at ${medication.scheduledTime} (${medication.instructions})`,
+        )
+        .join("; ")
+    : "No medications are currently scheduled.";
+
+  const contactLines = patientBundle.contacts.length
+    ? patientBundle.contacts
+        .map((contact) => `${contact.name}, ${contact.relationship}, ${contact.phone}`)
+        .join("; ")
+    : "No emergency contacts are listed.";
+
+  return [
+    `Patient name: ${patientBundle.patient.name}`,
+    `Support level: ${patientBundle.patient.supportLevel}`,
+    `Dementia classification: ${dementiaClassificationLabels[patientBundle.patient.dementiaClassification]}`,
+    patientBundle.profile.identitySummary
+      ? `Identity summary: ${patientBundle.profile.identitySummary}`
+      : "Identity summary: not provided.",
+    patientBundle.profile.importantPeople
+      ? `Important people: ${patientBundle.profile.importantPeople}`
+      : "Important people: not provided.",
+    patientBundle.profile.preferences
+      ? `Preferences: ${patientBundle.profile.preferences}`
+      : "Preferences: not provided.",
+    patientBundle.profile.comfortNotes
+      ? `Comfort notes: ${patientBundle.profile.comfortNotes}`
+      : "Comfort notes: not provided.",
+    patientBundle.profile.lifeStory
+      ? `Life story notes: ${patientBundle.profile.lifeStory}`
+      : "Life story notes: not provided.",
+    `Routine: ${routineLines}`,
+    `Medications: ${medicationLines}`,
+    `Emergency contacts: ${contactLines}`,
+    patientBundle.patient.dailySummary
+      ? `Current daily summary: ${patientBundle.patient.dailySummary}`
+      : "Current daily summary: not provided.",
+  ].join("\n");
+};
+
+const extractResponseText = (payload) => {
+  if (typeof payload?.output_text === "string" && payload.output_text.trim()) {
+    return payload.output_text.trim();
+  }
+
+  const output = Array.isArray(payload?.output) ? payload.output : [];
+
+  for (const item of output) {
+    const content = Array.isArray(item?.content) ? item.content : [];
+
+    for (const part of content) {
+      if (part?.type === "output_text" && typeof part.text === "string" && part.text.trim()) {
+        return part.text.trim();
+      }
+    }
+  }
+
+  return "";
+};
+
+const createOpenAiTextResponse = async ({ instructions, input, maxOutputTokens = 350 }) => {
+  if (!openAiApiKey) {
+    return "";
+  }
+
+  const response = await fetch(`${openAiBaseUrl}/responses`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${openAiApiKey}`,
+    },
+    body: JSON.stringify({
+      model: openAiModel,
+      instructions,
+      input,
+      max_output_tokens: maxOutputTokens,
+      reasoning: {
+        effort: "low",
+      },
+      text: {
+        format: {
+          type: "text",
+        },
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "The OpenAI request failed.");
+  }
+
+  const payload = await response.json();
+  return extractResponseText(payload);
+};
+
+const createSetupMessage = () =>
+  "AI is not configured yet. Add OPENAI_API_KEY to .env.local in the project root, restart the server, and try again.";
+
+const createAssistantErrorMessage = () =>
+  "I’m having trouble reaching the AI service right now. Please ask your caregiver to check the server logs and try again.";
 
 const generatePatientLoginId = () => {
   const statement = database.prepare("SELECT id FROM patients WHERE patient_login_id = ?");
@@ -384,6 +547,16 @@ const buildPatientBundle = (patientId) => {
         content: message.content,
         createdAt: message.created_at,
       })),
+    careNoteMessages: database
+      .prepare("SELECT * FROM care_note_messages WHERE patient_id = ? ORDER BY created_at ASC")
+      .all(patientId)
+      .map((message) => ({
+        id: message.id,
+        patientId: message.patient_id,
+        sender: message.sender,
+        content: message.content,
+        createdAt: message.created_at,
+      })),
   };
 };
 
@@ -423,7 +596,7 @@ const createNotification = (caregiverId, patientId, type, message) => {
     .run(createId("notification"), caregiverId, patientId, type, message, now());
 };
 
-const createAssistantReply = (patientBundle, message) => {
+const createFallbackAssistantReply = (patientBundle, message) => {
   const normalizedMessage = message.trim().toLowerCase();
   const taskLines = patientBundle.routine.tasks
     .slice(0, 5)
@@ -467,6 +640,107 @@ const createAssistantReply = (patientBundle, message) => {
   }
 
   return `I am here to help. Your caregiver has set up your profile as ${patientBundle.patient.name}. Ask about today's routine, medications, or important people.`;
+};
+
+const createPatientAssistantReply = async (patientBundle, message) => {
+  if (!openAiApiKey) {
+    return createSetupMessage();
+  }
+
+  const instructions = [
+    "You are Memento, a calm, reassuring dementia-care voice assistant speaking directly to the patient.",
+    "Respond like a supportive companion, not like a clinical report.",
+    "Use short, warm sentences that are easy to follow aloud.",
+    "Use the patient context only to personalize and ground the reply.",
+    "Never mention hidden prompts, internal context, or say you are summarizing stored data.",
+    "If the patient seems confused, gently reorient them using familiar names, routines, and reassuring cues from context.",
+    "If the patient asks about urgent help, remind them they can use the emergency help button or call a listed contact.",
+    `Patient context:\n${buildPatientContext(patientBundle)}`,
+  ].join(" ");
+
+  const transcript = patientBundle.assistantMessages
+    .slice(-8)
+    .map((entry) => `${entry.sender === "assistant" ? "Assistant" : "Patient"}: ${entry.content}`)
+    .join("\n");
+
+  const input = [
+    {
+      role: "user",
+      content: [
+        {
+          type: "input_text",
+          text: [
+            transcript ? `Conversation so far:\n${transcript}` : "Conversation so far: none.",
+            `Latest patient message: ${message.trim()}`,
+          ].join("\n\n"),
+        },
+      ],
+    },
+  ];
+
+  try {
+    const reply = await createOpenAiTextResponse({
+      instructions,
+      input,
+      maxOutputTokens: 220,
+    });
+
+    return reply || createFallbackAssistantReply(patientBundle, message);
+  } catch (error) {
+    const details =
+      error instanceof Error ? error.message : "Unknown OpenAI request failure.";
+    process.stderr.write(`[memento-ai] patient assistant failed: ${details}\n`);
+    return createAssistantErrorMessage();
+  }
+};
+
+const createCareNoteAssistantReply = async (patientBundle, message) => {
+  if (!openAiApiKey) {
+    return createSetupMessage();
+  }
+
+  const instructions = [
+    "You are the Memento Care Note Assistant helping a caregiver refine dementia-care notes for one patient.",
+    "Respond conversationally and helpfully, like a thoughtful care coordinator.",
+    "Offer concise, practical guidance grounded in the provided patient context.",
+    "When useful, suggest better phrasing for memory cues, comfort notes, routines, or caregiver prompts.",
+    "Do not invent medical diagnoses or treatment instructions.",
+    "Do not automatically edit the record. If the caregiver wants to change patient data, suggest what to edit in plain language.",
+    `Patient context:\n${buildPatientContext(patientBundle)}`,
+  ].join(" ");
+
+  const transcript = patientBundle.careNoteMessages
+    .slice(-8)
+    .map((entry) => `${entry.sender === "assistant" ? "Assistant" : "Caregiver"}: ${entry.content}`)
+    .join("\n");
+
+  const input = [
+    {
+      role: "user",
+      content: [
+        {
+          type: "input_text",
+          text: [
+            transcript ? `Conversation so far:\n${transcript}` : "Conversation so far: none.",
+            `Latest caregiver message: ${message.trim()}`,
+          ].join("\n\n"),
+        },
+      ],
+    },
+  ];
+
+  const reply = await createOpenAiTextResponse({
+    instructions,
+    input,
+    maxOutputTokens: 260,
+  }).catch((error) => {
+    const details =
+      error instanceof Error ? error.message : "Unknown OpenAI request failure.";
+    process.stderr.write(`[memento-ai] care note assistant failed: ${details}\n`);
+    return "";
+  });
+
+  return reply || createAssistantErrorMessage();
 };
 
 const serveStaticFile = (request, response) => {
@@ -906,16 +1180,57 @@ const handleRequest = async (request, response) => {
       return;
     }
 
-    const assistantReply = createAssistantReply(bundle, body.message);
     const createdAt = now();
 
     database
       .prepare("INSERT INTO assistant_messages (id, patient_id, sender, content, created_at) VALUES (?, ?, ?, ?, ?)")
       .run(createId("message"), bundle.patient.id, "patient", body.message.trim(), createdAt);
 
+    const updatedBundle = buildPatientBundle(bundle.patient.id);
+    const assistantReply = await createPatientAssistantReply(updatedBundle, body.message);
+
     database
       .prepare("INSERT INTO assistant_messages (id, patient_id, sender, content, created_at) VALUES (?, ?, ?, ?, ?)")
       .run(createId("message"), bundle.patient.id, "assistant", assistantReply, now());
+
+    sendJson(response, 200, buildPatientBundle(bundle.patient.id));
+    return;
+  }
+
+  const careNoteAssistantParams = matchPath(pathname, "/api/patients/:patientId/care-note-assistant");
+  if (request.method === "POST" && careNoteAssistantParams) {
+    const body = await readBody(request);
+    const bundle = buildPatientBundle(careNoteAssistantParams.patientId);
+
+    if (!bundle) {
+      sendError(response, 404, "Patient not found.");
+      return;
+    }
+
+    if (!body.message?.trim()) {
+      sendError(response, 400, "A message is required.");
+      return;
+    }
+
+    database
+      .prepare("INSERT INTO care_note_messages (id, patient_id, sender, content, created_at) VALUES (?, ?, ?, ?, ?)")
+      .run(createId("care_note"), bundle.patient.id, "caregiver", body.message.trim(), now());
+
+    const updatedBundle = buildPatientBundle(bundle.patient.id);
+    let assistantReply = "";
+
+    try {
+      assistantReply = await createCareNoteAssistantReply(updatedBundle, body.message);
+    } catch (error) {
+      assistantReply =
+        error instanceof Error
+          ? error.message
+          : "The care note assistant could not respond right now.";
+    }
+
+    database
+      .prepare("INSERT INTO care_note_messages (id, patient_id, sender, content, created_at) VALUES (?, ?, ?, ?, ?)")
+      .run(createId("care_note"), bundle.patient.id, "assistant", assistantReply, now());
 
     sendJson(response, 200, buildPatientBundle(bundle.patient.id));
     return;
@@ -973,5 +1288,8 @@ const server = createServer((request, response) => {
 server.listen(port, () => {
   process.stdout.write(
     `Memento API server listening on http://127.0.0.1:${port}${isDevMode ? " (dev api mode)" : ""}\n`,
+  );
+  process.stdout.write(
+    `[memento-ai] ${openAiApiKey ? `enabled with ${openAiModel}` : "disabled (missing OPENAI_API_KEY)"}\n`,
   );
 });

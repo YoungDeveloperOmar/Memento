@@ -117,6 +117,14 @@ export interface AssistantMessage {
   createdAt: string;
 }
 
+export interface CareNoteMessage {
+  id: string;
+  patientId: string;
+  sender: "caregiver" | "assistant";
+  content: string;
+  createdAt: string;
+}
+
 export interface ContactSubmission {
   id: string;
   name: string;
@@ -134,6 +142,7 @@ export interface PatientBundle {
   routine: Routine;
   emergencyAlerts: EmergencyAlert[];
   assistantMessages: AssistantMessage[];
+  careNoteMessages: CareNoteMessage[];
 }
 
 export interface CaregiverDashboardData {

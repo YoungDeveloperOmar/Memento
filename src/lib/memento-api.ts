@@ -147,6 +147,12 @@ export const sendAssistantMessage = (patientId: string, payload: { message: stri
     body: JSON.stringify(payload),
   });
 
+export const sendCareNoteMessage = (patientId: string, payload: { message: string }) =>
+  requestJson<PatientBundle>(`/api/patients/${patientId}/care-note-assistant`, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+
 export const sendEmergencyAlert = (
   patientId: string,
   payload: { triggeredByRole: UserRole },

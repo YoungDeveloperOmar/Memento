@@ -16,6 +16,7 @@ import {
   loginCaregiver,
   loginPatient,
   registerCaregiver,
+  sendCareNoteMessage as sendCareNoteMessageRequest,
   sendAssistantMessage as sendAssistantMessageRequest,
   sendEmergencyAlert as sendEmergencyAlertRequest,
   submitSupportRequest as submitSupportRequestRequest,
@@ -71,6 +72,7 @@ type MementoContextValue = {
   ) => Promise<PatientBundle>;
   toggleRoutineTaskStatus: (taskId: string) => Promise<PatientBundle>;
   updateDailySummary: (patientId: string, dailySummary: string) => Promise<PatientBundle>;
+  sendCareNoteMessage: (patientId: string, message: string) => Promise<PatientBundle>;
   sendAssistantMessage: (patientId: string, message: string) => Promise<PatientBundle>;
   sendEmergencyAlert: (patientId: string, triggeredByRole: UserRole) => Promise<PatientBundle>;
   submitSupportRequest: (values: ContactFormValues) => Promise<void>;
@@ -377,6 +379,12 @@ export const MementoProvider = ({ children }: { children: ReactNode }) => {
     return bundle;
   };
 
+  const sendCareNoteMessage = async (patientId: string, message: string) => {
+    const bundle = await sendCareNoteMessageRequest(patientId, { message });
+    applyPatientBundle(bundle);
+    return bundle;
+  };
+
   const sendAssistantMessage = async (patientId: string, message: string) => {
     const bundle = await sendAssistantMessageRequest(patientId, { message });
     applyPatientBundle(bundle);
@@ -421,6 +429,7 @@ export const MementoProvider = ({ children }: { children: ReactNode }) => {
     addRoutineTask,
     toggleRoutineTaskStatus,
     updateDailySummary,
+    sendCareNoteMessage,
     sendAssistantMessage,
     sendEmergencyAlert,
     submitSupportRequest,

@@ -379,7 +379,8 @@ const PatientDashboard = () => {
                   <div>
                     <h2 className="text-xl font-bold">Memento Assistant</h2>
                     <p className="text-sm text-muted-foreground">
-                      Ask who you are, what is scheduled today, or who is important to you.
+                      Talk with a personalized assistant about your day, your
+                      people, or anything you need help remembering.
                     </p>
                   </div>
                 </div>
@@ -436,6 +437,10 @@ const PatientDashboard = () => {
                         Read Latest Reply
                       </Button>
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      If the assistant says AI is not configured yet, add
+                      `OPENAI_API_KEY` to `.env.local` and restart the server.
+                    </p>
                   </form>
                 </Form>
               </div>
