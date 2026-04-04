@@ -21,61 +21,16 @@
 // ─────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
+import 'package:memento/features/screens/home/home_screen.dart';
 
-import '../features/screens/home/home_screen.dart';
-import '../features/screens/reminders/reminders_screen.dart';
-import '../features/screens/location/location_screen.dart';
-import '../features/screens/memory/memory_screen.dart';
-import '../features/screens/chatbot/chatbot_screen.dart';
-import '../features/screens/caregiver/caregiver_screen.dart';
-import 'bottom_nav_bar.dart';
-
-class MainShell extends StatefulWidget {
+class MainShell extends StatelessWidget {
   const MainShell({super.key});
 
   @override
-  State<MainShell> createState() => _MainShellState();
-}
-
-class _MainShellState extends State<MainShell> {
-  int _currentIndex = 0;
-
-  void _onNavTap(int index) {
-    setState(() => _currentIndex = index);
-  }
-
-  // ── Screen list ───────────────────────────────────────────
-  // Built lazily — each screen is only constructed once and
-  // kept alive by the IndexedStack.
-  late final List<Widget> _screens = [
-    HomeScreen(onNavigate: _onNavTap), // index 0
-    const RemindersScreen(),           // index 1
-    const LocationScreen(),            // index 2
-    const MemoryScreen(),              // index 3
-    const ChatbotScreen(),             // index 4
-    const CaregiverScreen(),           // index 5
-  ];
-
-  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // ── Body ───────────────────────────────────────────────
-      // IndexedStack renders all screens but only shows the
-      // active one — avoids rebuild/state-loss on tab switch.
-      body: IndexedStack(
-        index: _currentIndex,
-        children: _screens,
-      ),
-
-      // ── Bottom Navigation ──────────────────────────────────
-      bottomNavigationBar: MementoBottomNavBar(
-        currentIndex: _currentIndex,
-        onTap: _onNavTap,
-      ),
-    );
+    return const HomeScreen();
   }
 }
-
 // ─────────────────────────────────────────────────────────────
 //  Future: go_router integration
 //

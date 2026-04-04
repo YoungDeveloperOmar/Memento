@@ -14,9 +14,9 @@
 
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
-import '../../core/constants/app_constants.dart';
+import 'package:memento/core/theme/app_colors.dart';
+import 'package:memento/core/theme/app_text_styles.dart';
+import 'package:memento/core/constants/app_constants.dart';
 
 class AppScaffold extends StatelessWidget {
   const AppScaffold({
@@ -153,11 +153,11 @@ class MementoCard extends StatelessWidget {
         color: color ?? AppColors.surface,
         borderRadius:
             BorderRadius.circular(borderRadius ?? AppConstants.radiusL),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),

@@ -261,11 +261,11 @@ class _MessageBubble extends StatelessWidget {
                     isUser ? AppConstants.radiusS : AppConstants.radiusL,
                   ),
                 ),
-                boxShadow: [
+                boxShadow: const [
                   BoxShadow(
                     color: AppColors.shadow,
                     blurRadius: 6,
-                    offset: const Offset(0, 2),
+                    offset: Offset(0, 2),
                   ),
                 ],
               ),
@@ -288,7 +288,7 @@ class _MessageBubble extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.volume_up_rounded,
                             size: 18,
                             color: AppColors.featureChatbot,
@@ -407,7 +407,7 @@ class _SuggestionChips extends StatelessWidget {
             ),
             backgroundColor: AppColors.featureChatbotSurface,
             side: BorderSide(
-              color: AppColors.featureChatbot.withOpacity(0.4),
+              color: AppColors.featureChatbot.withValues(alpha: 0.4),
             ),
             padding: const EdgeInsets.symmetric(
               horizontal: AppConstants.spaceM,

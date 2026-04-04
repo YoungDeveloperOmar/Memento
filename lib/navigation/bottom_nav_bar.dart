@@ -11,9 +11,9 @@
 
 import 'package:flutter/material.dart';
 
-import '../core/theme/app_colors.dart';
-import '../core/theme/app_text_styles.dart';
-import '../core/constants/app_strings.dart';
+import 'package:memento/core/theme/app_colors.dart';
+import 'package:memento/core/theme/app_text_styles.dart';
+import 'package:memento/core/constants/app_strings.dart';
 
 /// Definition of a single navigation destination.
 class NavDestination {
@@ -76,13 +76,13 @@ class MementoBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 16,
-            offset: const Offset(0, -4),
+            offset: Offset(0, -4),
           ),
         ],
       ),
@@ -135,7 +135,7 @@ class _NavItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
-              ? AppColors.primary.withOpacity(0.07)
+              ? AppColors.primary.withValues(alpha: 0.07)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
         ),

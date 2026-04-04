@@ -75,7 +75,7 @@ class CaregiverScreen extends StatelessWidget {
           const SizedBox(height: AppConstants.spaceL),
 
           // ── Recent Alerts ─────────────────────────────────
-          SectionHeader(AppStrings.caregiverAlertsSection),
+          const SectionHeader(AppStrings.caregiverAlertsSection),
           if (_alerts.isEmpty)
             _EmptyAlerts()
           else
@@ -87,7 +87,7 @@ class CaregiverScreen extends StatelessWidget {
             ),
 
           // ── Today's Reminders Summary ─────────────────────
-          SectionHeader(AppStrings.caregiverRemindersSection),
+          const SectionHeader(AppStrings.caregiverRemindersSection),
           _RemindersSummary(),
           const SizedBox(height: AppConstants.spaceXXL),
         ],
@@ -104,7 +104,7 @@ class _PatientStatusCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
+        gradient: const LinearGradient(
           colors: [AppColors.primary, AppColors.primaryLight],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -112,7 +112,7 @@ class _PatientStatusCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppConstants.radiusXL),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),
@@ -144,7 +144,7 @@ class _PatientStatusCard extends StatelessWidget {
                     Text(
                       'Your patient',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.white.withOpacity(0.8),
+                        color: AppColors.white.withValues(alpha: 0.8),
                       ),
                     ),
                   ],
@@ -173,16 +173,16 @@ class _PatientStatusCard extends StatelessWidget {
           // Status row
           Row(
             children: [
-              _StatusPill(
+              const _StatusPill(
                 icon: Icons.shield_rounded,
                 label: 'In safe zone',
-                color: const Color(0xFF6EE7B7),
+                color: Color(0xFF6EE7B7),
               ),
               const SizedBox(width: AppConstants.spaceM),
               _StatusPill(
                 icon: Icons.access_time_rounded,
                 label: 'Last seen 3m ago',
-                color: AppColors.white.withOpacity(0.85),
+                color: AppColors.white.withValues(alpha: 0.85),
               ),
             ],
           ),
@@ -211,7 +211,7 @@ class _StatusPill extends StatelessWidget {
         vertical: AppConstants.spaceS,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
+        color: Colors.white.withValues(alpha: 0.2),
         borderRadius: BorderRadius.circular(AppConstants.radiusFull),
       ),
       child: Row(
@@ -301,7 +301,7 @@ class _ActionButton extends StatelessWidget {
           color: backgroundColor,
           borderRadius: BorderRadius.circular(AppConstants.radiusL),
           border: Border.all(
-            color: color.withOpacity(0.3),
+            color: color.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -363,14 +363,14 @@ class _AlertCard extends StatelessWidget {
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
         border: Border.all(
-          color: _color.withOpacity(0.4),
+          color: _color.withValues(alpha: 0.4),
           width: 1.5,
         ),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
@@ -456,21 +456,21 @@ class _RemindersSummary extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),
       padding: const EdgeInsets.all(AppConstants.cardPadding),
-      child: Column(
+      child: const Column(
         children: [
           _ReminderRow(name: 'Aspirin', time: '8:00 AM', isDone: true),
-          const Divider(height: AppConstants.spaceL),
+          Divider(height: AppConstants.spaceL),
           _ReminderRow(name: 'Blood Pressure Pill', time: '8:30 AM', isDone: false),
-          const Divider(height: AppConstants.spaceL),
+          Divider(height: AppConstants.spaceL),
           _ReminderRow(name: 'Vitamin D', time: '1:00 PM', isDone: false),
         ],
       ),

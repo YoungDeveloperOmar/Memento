@@ -27,9 +27,10 @@ abstract class AppColors {
   static const Color secondarySurface = Color(0xFFFAEDE5);
 
   // ── Background & Surface ────────────────────────────────────
-  static const Color background = Color(0xFFF7F3EE); // warm cream
+  // Background & Surface
+  static const Color background = Color(0xFFFFFFFF); // pure white
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceVariant = Color(0xFFF0EBE3);
+  static const Color surfaceVariant = Color(0xFFF5F5F5);
 
   // ── Text ────────────────────────────────────────────────────
   static const Color textPrimary = Color(0xFF2C3E35);   // deep sage-slate
@@ -39,11 +40,11 @@ abstract class AppColors {
   // ── Semantic / Feature Colors ────────────────────────────────
   // Each feature has a distinct, recognizable color for dementia-friendly
   // visual anchoring — patients can learn "blue = location."
-  static const Color featureReminders = Color(0xFF7B9ECC); // calm blue
-  static const Color featureLocation = Color(0xFF7DC4A0);  // mint green
-  static const Color featureMemory = Color(0xFFBF8DC0);    // soft lilac
-  static const Color featureChatbot = Color(0xFFD4A35A);   // warm gold
-  static const Color featureCaregiver = Color(0xFFD47A7A); // soft rose
+  static const Color featureReminders = Color(0xFF7B9ECC); // blue
+  static const Color featureLocation = Color(0xFF7DC4A0);  // green
+  static const Color featureMemory = Color(0xFFBF8DC0);    // purple
+  static const Color featureChatbot = Color(0xFFD4A35A);   // orange
+  static const Color featureCaregiver = Color(0xFFD47A7A); // red
 
   // Lighter tints for card backgrounds
   static const Color featureRemindersSurface = Color(0xFFEBF2FA);

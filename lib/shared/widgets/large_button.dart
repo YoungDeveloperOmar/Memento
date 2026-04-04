@@ -12,9 +12,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:memento/core/theme/app_colors.dart';
-
-import '../../core/theme/app_text_styles.dart';
-import '../../core/constants/app_constants.dart';
+import 'package:memento/core/theme/app_text_styles.dart';
+import 'package:memento/core/constants/app_constants.dart';
 
 enum LargeButtonStyle { primary, secondary, ghost }
 

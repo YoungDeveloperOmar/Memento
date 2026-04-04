@@ -70,7 +70,7 @@ class MemoryScreen extends StatelessWidget {
       child: ListView(
         children: [
           // ── Family & Friends ──────────────────────────────
-          SectionHeader(AppStrings.memoryFamilySection),
+          const SectionHeader(AppStrings.memoryFamilySection),
           SizedBox(
             height: 160,
             child: ListView.separated(
@@ -84,7 +84,7 @@ class MemoryScreen extends StatelessWidget {
           const SizedBox(height: AppConstants.spaceL),
 
           // ── Familiar Places ────────────────────────────────
-          SectionHeader(AppStrings.memoryPlacesSection),
+          const SectionHeader(AppStrings.memoryPlacesSection),
           ..._places.map(
             (p) => Padding(
               padding: const EdgeInsets.only(bottom: AppConstants.spaceM),
@@ -93,20 +93,20 @@ class MemoryScreen extends StatelessWidget {
           ),
 
           // ── Important Info ─────────────────────────────────
-          SectionHeader(AppStrings.memoryImportantSection),
-          _InfoCard(
+          const SectionHeader(AppStrings.memoryImportantSection),
+          const _InfoCard(
             label: 'My Name',
             value: 'John Smith', // TODO: load from profile
             icon: Icons.badge_rounded,
           ),
           const SizedBox(height: AppConstants.spaceM),
-          _InfoCard(
+          const _InfoCard(
             label: 'My Address',
             value: '123 Home Street, Chicago, IL',
             icon: Icons.home_rounded,
           ),
           const SizedBox(height: AppConstants.spaceM),
-          _InfoCard(
+          const _InfoCard(
             label: 'Date of Birth',
             value: '12 March 1945',
             icon: Icons.cake_rounded,
@@ -138,7 +138,7 @@ class _PersonCard extends StatelessWidget {
           color: AppColors.featureMemorySurface,
           borderRadius: BorderRadius.circular(AppConstants.radiusL),
           border: Border.all(
-            color: AppColors.featureMemory.withOpacity(0.3),
+            color: AppColors.featureMemory.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -151,7 +151,7 @@ class _PersonCard extends StatelessWidget {
               width: 64,
               height: 64,
               decoration: BoxDecoration(
-                color: AppColors.featureMemory.withOpacity(0.2),
+                color: AppColors.featureMemory.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Center(
@@ -204,7 +204,7 @@ class _PlaceCard extends StatelessWidget {
           color: AppColors.featureMemorySurface,
           borderRadius: BorderRadius.circular(AppConstants.radiusL),
           border: Border.all(
-            color: AppColors.featureMemory.withOpacity(0.3),
+            color: AppColors.featureMemory.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -215,7 +215,7 @@ class _PlaceCard extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: AppColors.featureMemory.withOpacity(0.15),
+                color: AppColors.featureMemory.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppConstants.radiusM),
               ),
               child: Icon(
@@ -235,7 +235,7 @@ class _PlaceCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.directions_rounded,
               color: AppColors.featureMemory,
               size: AppConstants.iconM,
@@ -267,11 +267,11 @@ class _InfoCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
-        boxShadow: [
+        boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 8,
-            offset: const Offset(0, 2),
+            offset: Offset(0, 2),
           ),
         ],
       ),

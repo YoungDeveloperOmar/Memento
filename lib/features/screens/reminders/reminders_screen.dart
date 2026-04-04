@@ -79,7 +79,7 @@ class RemindersScreen extends StatelessWidget {
       child: ListView(
         children: [
           // ── Morning ─────────────────────────────────────
-          SectionHeader(AppStrings.remindersMorning),
+          const SectionHeader(AppStrings.remindersMorning),
           ..._morningReminders.map(
             (r) => Padding(
               padding: const EdgeInsets.only(bottom: AppConstants.spaceM),
@@ -88,7 +88,7 @@ class RemindersScreen extends StatelessWidget {
           ),
 
           // ── Afternoon ────────────────────────────────────
-          SectionHeader(AppStrings.remindersAfternoon),
+          const SectionHeader(AppStrings.remindersAfternoon),
           ..._afternoonReminders.map(
             (r) => Padding(
               padding: const EdgeInsets.only(bottom: AppConstants.spaceM),
@@ -97,7 +97,7 @@ class RemindersScreen extends StatelessWidget {
           ),
 
           // ── Evening ──────────────────────────────────────
-          SectionHeader(AppStrings.remindersEvening),
+          const SectionHeader(AppStrings.remindersEvening),
           ..._eveningReminders.map(
             (r) => Padding(
               padding: const EdgeInsets.only(bottom: AppConstants.spaceM),
@@ -133,7 +133,7 @@ class _ReminderCard extends StatelessWidget {
           border: Border.all(
             color: reminder.isDone
                 ? AppColors.divider
-                : AppColors.featureReminders.withOpacity(0.3),
+                : AppColors.featureReminders.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -145,7 +145,7 @@ class _ReminderCard extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: AppColors.featureReminders.withOpacity(0.15),
+                color: AppColors.featureReminders.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppConstants.radiusM),
               ),
               child: Icon(

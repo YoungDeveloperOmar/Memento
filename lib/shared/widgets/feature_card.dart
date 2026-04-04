@@ -12,9 +12,9 @@
 
 import 'package:flutter/material.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../../core/theme/app_text_styles.dart';
-import '../../core/constants/app_constants.dart';
+import 'package:memento/core/theme/app_colors.dart';
+import 'package:memento/core/theme/app_text_styles.dart';
+import 'package:memento/core/constants/app_constants.dart';
 
 /// A square card representing a single app feature.
 class FeatureCard extends StatelessWidget {
@@ -53,7 +53,7 @@ class FeatureCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(AppConstants.radiusXL),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.15),
+              color: color.withValues(alpha: 0.15),
               blurRadius: 12,
               offset: const Offset(0, 4),
             ),
@@ -71,7 +71,7 @@ class FeatureCard extends StatelessWidget {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.15),
+                    color: color.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -163,7 +163,7 @@ class FeatureListTile extends StatelessWidget {
               width: 56,
               height: 56,
               decoration: BoxDecoration(
-                color: color.withOpacity(0.15),
+                color: color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(AppConstants.radiusM),
               ),
               child: Icon(icon, size: AppConstants.iconL, color: color),

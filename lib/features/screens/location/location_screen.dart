@@ -32,8 +32,8 @@ class LocationScreen extends StatelessWidget {
       child: Column(
         children: [
           // ── Status Banner ─────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.symmetric(
+          const Padding(
+            padding: EdgeInsets.symmetric(
               horizontal: AppConstants.screenPadding,
             ),
             child: _StatusBanner(isInSafeZone: _isInSafeZone),
@@ -110,7 +110,7 @@ class _StatusBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: bgColor,
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
-        border: Border.all(color: color.withOpacity(0.4), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.4), width: 1.5),
       ),
       child: Row(
         children: [
@@ -151,7 +151,7 @@ class _MapPlaceholder extends StatelessWidget {
         color: AppColors.featureLocationSurface,
         borderRadius: BorderRadius.circular(AppConstants.radiusXL),
         border: Border.all(
-          color: AppColors.featureLocation.withOpacity(0.3),
+          color: AppColors.featureLocation.withValues(alpha: 0.3),
           width: 1.5,
         ),
       ),
@@ -161,7 +161,7 @@ class _MapPlaceholder extends StatelessWidget {
           Icon(
             Icons.map_rounded,
             size: AppConstants.iconHero,
-            color: AppColors.featureLocation.withOpacity(0.5),
+            color: AppColors.featureLocation.withValues(alpha: 0.5),
           ),
           const SizedBox(height: AppConstants.spaceM),
           Text(

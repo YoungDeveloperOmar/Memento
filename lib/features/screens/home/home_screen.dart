@@ -10,28 +10,25 @@
 // ─────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import 'package:memento/core/theme/app_colors.dart';
 
-import '../../../core/theme/app_text_styles.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../shared/widgets/feature_card.dart';
+import 'package:memento/core/constants/app_constants.dart';
+import 'package:memento/core/constants/app_strings.dart';
+import 'package:memento/core/theme/app_colors.dart';
+import 'package:memento/core/theme/app_text_styles.dart';
+import 'package:memento/shared/widgets/large_button.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({
-    super.key,
-    required this.onNavigate,
-  });
+  const HomeScreen({super.key});
 
-  /// Callback to switch the bottom nav tab.
-  /// Index: 0=Home, 1=Reminders, 2=Location, 3=Memory, 4=Chatbot, 5=Caregiver
-  final ValueChanged<int> onNavigate;
+  String getGreeting() {
+    final hour = DateTime.now().hour;
+    if (hour < 12) return AppStrings.homeGreetingMorning;
+    if (hour < 18) return AppStrings.homeGreetingAfternoon;
+    return AppStrings.homeGreetingEvening;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final greeting = _getGreeting();
-    final dateString = _getFormattedDate();
-
     return Scaffold(
       backgroundColor: AppColors.background,
       body: SafeArea(
@@ -40,89 +37,110 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: AppConstants.spaceM),
-
-              // ── Date chip ─────────────────────────────────
-              _DateChip(dateString: dateString),
-              const SizedBox(height: AppConstants.spaceXL),
-
-              // ── Greeting ──────────────────────────────────
+              // ── Greeting ─────────────────────────────
               Text(
-                '$greeting,',
-                style: AppTextStyles.bodyLarge.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+                '${getGreeting()}, ${AppStrings.homeDefaultName}',
+                style: AppTextStyles.displayMedium,
               ),
-              const SizedBox(height: AppConstants.spaceXS),
-              Text(
-                // TODO: Replace 'there' with patient's real name from profile
-                AppStrings.homeDefaultName,
-                style: AppTextStyles.displayLarge,
-              ),
+
               const SizedBox(height: AppConstants.spaceS),
+
               Text(
-                AppStrings.homeSubtitle,
+                '${AppStrings.homeTodayDate} ${DateTime.now().toLocal().toString().split(' ')[0]}',
                 style: AppTextStyles.bodyMedium.copyWith(
                   color: AppColors.textSecondary,
                 ),
               ),
-              const SizedBox(height: AppConstants.spaceXXL),
 
-              // ── Feature Cards Grid ─────────────────────────
-              Text(
-                'What would you like to do?',
-                style: AppTextStyles.headlineSmall.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: AppConstants.spaceL),
-
-              GridView.count(
-                crossAxisCount: 2,
-                crossAxisSpacing: AppConstants.spaceM,
-                mainAxisSpacing: AppConstants.spaceM,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                children: [
-                  // Medications / Reminders
-                  FeatureCard(
-                    label: AppStrings.homeMyMeds,
-                    icon: Icons.medication_rounded,
-                    color: AppColors.featureReminders,
-                    backgroundColor: AppColors.featureRemindersSurface,
-                    onTap: () => onNavigate(1),
-                    badge: 2, // TODO: pull real count from reminders service
-                  ),
-                  // Location
-                  FeatureCard(
-                    label: AppStrings.homeWhereAmI,
-                    icon: Icons.location_on_rounded,
-                    color: AppColors.featureLocation,
-                    backgroundColor: AppColors.featureLocationSurface,
-                    onTap: () => onNavigate(2),
-                  ),
-                  // Memory book
-                  FeatureCard(
-                    label: AppStrings.homeMyFamily,
-                    icon: Icons.favorite_rounded,
-                    color: AppColors.featureMemory,
-                    backgroundColor: AppColors.featureMemorySurface,
-                    onTap: () => onNavigate(3),
-                  ),
-                  // Chatbot
-                  FeatureCard(
-                    label: AppStrings.homeAskMemo,
-                    icon: Icons.chat_bubble_rounded,
-                    color: AppColors.featureChatbot,
-                    backgroundColor: AppColors.featureChatbotSurface,
-                    onTap: () => onNavigate(4),
-                  ),
-                ],
-              ),
               const SizedBox(height: AppConstants.spaceXL),
 
-              // ── Quick Help Banner ─────────────────────────
-              _EmergencyBanner(),
+              // ── Upcoming (NON-clickable) ─────────────
+              Text(
+                "Coming Up",
+                style: AppTextStyles.headlineSmall,
+              ),
+
+              const SizedBox(height: AppConstants.spaceM),
+
+              const _InfoCard(
+                title: "Next Medication",
+                subtitle: "Aspirin - 2:00 PM",
+                color: AppColors.featureReminders,
+              ),
+
+              const SizedBox(height: AppConstants.spaceM),
+
+              const _InfoCard(
+                title: "Next Activity",
+                subtitle: "Doctor Appointment - 4:00 PM",
+                color: AppColors.featureLocation,
+              ),
+
+              const SizedBox(height: AppConstants.spaceXL),
+
+              // ── Buttons ──────────────────────────────
+              Text(
+                "My Day",
+                style: AppTextStyles.headlineSmall,
+              ),
+
+              const SizedBox(height: AppConstants.spaceM),
+
+              LargeButton(
+                label: "My Day",
+                icon: Icons.calendar_today,
+                backgroundColor: AppColors.featureLocation,
+                onPressed: () {},
+              ),
+
+              const SizedBox(height: AppConstants.spaceM),
+
+              LargeButton(
+                label: "My Medicine",
+                icon: Icons.medication,
+                backgroundColor: AppColors.featureReminders,
+                onPressed: () {},
+              ),
+
+              const SizedBox(height: AppConstants.spaceM),
+
+              LargeButton(
+                label: "Important People",
+                icon: Icons.people,
+                backgroundColor: AppColors.featureMemory,
+                onPressed: () {},
+              ),
+
+              const SizedBox(height: AppConstants.spaceM),
+
+              LargeButton(
+                label: "Important Places",
+                icon: Icons.location_on,
+                backgroundColor: AppColors.featureLocation,
+                onPressed: () {},
+              ),
+
+              const SizedBox(height: AppConstants.spaceM),
+
+              LargeButton(
+                label: "Ask Memo",
+                icon: Icons.chat,
+                backgroundColor: AppColors.featureChatbot,
+                onPressed: () {},
+              ),
+
+              const SizedBox(height: AppConstants.spaceXL),
+
+              LargeButton(
+                label: "Emergency Help",
+                icon: Icons.warning_rounded,
+                backgroundColor: AppColors.error.withValues(alpha: 0.15),
+                foregroundColor: AppColors.error,
+                onPressed: () {
+                  _showEmergencySheet(context);
+                },
+              ),
+
               const SizedBox(height: AppConstants.spaceXL),
             ],
           ),
@@ -130,131 +148,156 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
-  // ── Helpers ──────────────────────────────────────────────────
-
-  String _getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return AppStrings.homeGreetingMorning;
-    if (hour < 17) return AppStrings.homeGreetingAfternoon;
-    return AppStrings.homeGreetingEvening;
-  }
-
-  String _getFormattedDate() {
-    final now = DateTime.now();
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December',
-    ];
-    const days = [
-      'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
-    ];
-    final dayName = days[now.weekday - 1];
-    final monthName = months[now.month - 1];
-    return '$dayName, ${now.day} $monthName ${now.year}';
-  }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  Private widgets — only used on the Home screen.
-// ─────────────────────────────────────────────────────────────
+class _EmergencyContactTile extends StatelessWidget {
+  const _EmergencyContactTile({
+    required this.name,
+    required this.phone,
+  });
 
-class _DateChip extends StatelessWidget {
-  const _DateChip({required this.dateString});
-
-  final String dateString;
+  final String name;
+  final String phone;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppConstants.spaceM,
-        vertical: AppConstants.spaceS,
-      ),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.primarySurface,
-        borderRadius: BorderRadius.circular(AppConstants.radiusFull),
+        color: Colors.red.withValues(alpha: 0.05),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.calendar_today_rounded,
-            size: 18,
-            color: AppColors.primary,
-          ),
-          const SizedBox(width: AppConstants.spaceS),
-          Text(
-            dateString,
-            style: AppTextStyles.labelMedium.copyWith(
-              color: AppColors.primary,
-            ),
-          ),
+          Text(name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          const SizedBox(height: 4),
+          Text(phone),
+
+          const SizedBox(height: 12),
+
+          Row(
+            children: [
+              Expanded(
+                child: ElevatedButton.icon(
+                  icon: const Icon(Icons.call),
+                  label: const Text("Call"),
+                  onPressed: () {
+                    // TODO: integrate phone call
+                  },
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: OutlinedButton.icon(
+                  icon: const Icon(Icons.message),
+                  label: const Text("Message"),
+                  onPressed: () {
+                    // TODO: integrate SMS
+                  },
+                ),
+              ),
+            ],
+          )
         ],
       ),
     );
   }
 }
 
-class _EmergencyBanner extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // TODO: trigger emergency call / caregiver alert
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(AppConstants.cardPadding),
-        decoration: BoxDecoration(
-          color: AppColors.featureCaregiverSurface,
-          borderRadius: BorderRadius.circular(AppConstants.radiusL),
-          border: Border.all(
-            color: AppColors.featureCaregiver.withOpacity(0.4),
-            width: 1.5,
-          ),
-        ),
-        child: Row(
+void _showEmergencySheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (_) {
+      return const Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                color: AppColors.featureCaregiver.withOpacity(0.15),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.phone_rounded,
-                color: AppColors.featureCaregiver,
-                size: 28,
-              ),
+            // ── Title ─────────────────────────────
+            Text(
+              "Emergency Contacts",
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(width: AppConstants.spaceM),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Need help?',
-                    style: AppTextStyles.headlineSmall.copyWith(
-                      color: AppColors.featureCaregiver,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    'Tap to call your caregiver',
-                    style: AppTextStyles.bodySmall,
-                  ),
-                ],
-              ),
+
+            SizedBox(height: 16),
+
+            // ── Contact 1 ─────────────────────────
+            _EmergencyContactTile(
+              name: "Sarah (Daughter)",
+              phone: "123-456-7890",
             ),
-            const Icon(
-              Icons.chevron_right_rounded,
-              color: AppColors.featureCaregiver,
-              size: 28,
+
+            SizedBox(height: 12),
+
+            // ── Contact 2 ─────────────────────────
+            _EmergencyContactTile(
+              name: "Dr. Smith",
+              phone: "987-654-3210",
             ),
+
+            SizedBox(height: 20),
+
+            // ── Patient Info ──────────────────────
+            Text(
+              "Important Information",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+
+            SizedBox(height: 8),
+
+            Text("Address: 123 Home Street, Chicago, IL"),
+            Text("Caregiver: Sarah"),
+            Text("Condition: Dementia"),
+
+            SizedBox(height: 24),
           ],
         ),
+      );
+    },
+  );
+}
+
+// ─────────────────────────────────────────────
+// Simple non-clickable info card
+// ─────────────────────────────────────────────
+class _InfoCard extends StatelessWidget {
+  const _InfoCard({
+    required this.title,
+    required this.subtitle,
+    required this.color,
+  });
+
+  final String title;
+  final String subtitle;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppConstants.cardPadding),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(AppConstants.radiusL),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: AppTextStyles.labelMedium),
+          const SizedBox(height: 4),
+          Text(
+            subtitle,
+            style: AppTextStyles.bodyLarge.copyWith(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
