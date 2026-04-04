@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+
+@layer base {
+  :root {
+    --background: 40 33% 97%;
+    --foreground: 30 10% 20%;
+
+    --card: 40 30% 99%;
+    --card-foreground: 30 10% 20%;
+
+    --popover: 40 30% 99%;
+    --popover-foreground: 30 10% 20%;
+
+    --primary: 160 35% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 30% 93%;
+    --secondary-foreground: 30 10% 25%;
+
+    --muted: 40 20% 94%;
+    --muted-foreground: 30 8% 50%;
+
+    --accent: 200 45% 88%;
+    --accent-foreground: 200 40% 25%;
+
+    --destructive: 0 65% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 40 20% 90%;
+    --input: 40 20% 90%;
+    --ring: 160 35% 42%;
+
+    --radius: 1rem;
+
+    --warm: 30 60% 52%;
+    --warm-foreground: 0 0% 100%;
+    --sage: 140 20% 90%;
+    --sage-foreground: 140 25% 30%;
+    --sky: 200 45% 92%;
+    --sky-foreground: 200 40% 25%;
+    --cream: 40 33% 95%;
+    --coral: 15 70% 60%;
+    --coral-foreground: 0 0% 100%;
+
+    --sidebar-background: 40 30% 97%;
+    --sidebar-foreground: 30 10% 25%;
+    --sidebar-primary: 160 35% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 20% 94%;
+    --sidebar-accent-foreground: 30 10% 25%;
+    --sidebar-border: 40 20% 90%;
+    --sidebar-ring: 160 35% 42%;
+  }
+
+  .dark {
+    --background: 30 10% 10%;
+    --foreground: 40 20% 92%;
+    --card: 30 10% 13%;
+    --card-foreground: 40 20% 92%;
+    --popover: 30 10% 13%;
+    --popover-foreground: 40 20% 92%;
+    --primary: 160 35% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 10% 18%;
+    --secondary-foreground: 40 20% 90%;
+    --muted: 30 8% 18%;
+    --muted-foreground: 40 10% 60%;
+    --accent: 200 30% 20%;
+    --accent-foreground: 200 40% 85%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 30 8% 20%;
+    --input: 30 8% 20%;
+    --ring: 160 35% 50%;
+    --sidebar-background: 30 10% 10%;
+    --sidebar-foreground: 40 20% 90%;
+    --sidebar-primary: 160 35% 50%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 30 8% 18%;
+    --sidebar-accent-foreground: 40 20% 90%;
+    --sidebar-border: 30 8% 20%;
+    --sidebar-ring: 160 35% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-body;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold;
+    line-height: 1.3;
+  }
+}
