@@ -223,7 +223,7 @@ const PatientDashboard = () => {
   return (
     <Layout>
       <section className="px-4 py-10 md:py-16">
-        <div className="container mx-auto max-w-6xl space-y-8">
+        <div className="container mx-auto max-w-[1700px] space-y-8">
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-3">
                 <p className="text-lg text-muted-foreground">Welcome back,</p>
@@ -242,7 +242,7 @@ const PatientDashboard = () => {
             </div>
           </div>
 
-          <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.45fr)_380px] 2xl:grid-cols-[minmax(0,1.6fr)_420px]">
             <div className="space-y-6">
               <div className="rounded-3xl border bg-card p-6 shadow-sm md:p-8">
                 <div className="mb-5 flex items-center gap-3">
@@ -371,7 +371,7 @@ const PatientDashboard = () => {
                 </div>
               </div>
 
-              <div className="rounded-3xl border bg-card p-6 shadow-sm md:p-8">
+              <div className="rounded-3xl border bg-card p-6 shadow-sm md:p-8 2xl:p-10">
                 <div className="mb-5 flex items-center gap-3">
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent">
                     <Bot className="h-6 w-6 text-foreground/70" />
@@ -385,25 +385,27 @@ const PatientDashboard = () => {
                   </div>
                 </div>
 
-                <div className="max-h-[320px] space-y-3 overflow-y-auto rounded-2xl bg-secondary/40 p-4">
+                <div className="max-h-[460px] space-y-4 overflow-y-auto rounded-3xl bg-secondary/40 p-5 md:p-6">
                   {assistantMessages.length ? (
                     assistantMessages.map((message) => (
                       <div
                         key={message.id}
-                        className={`rounded-2xl p-4 ${
+                        className={`rounded-3xl p-5 md:p-6 ${
                           message.sender === "assistant"
                             ? "bg-card"
-                            : "ml-auto max-w-[85%] bg-primary/10"
+                            : "ml-auto max-w-[92%] bg-primary/10"
                         }`}
                       >
                         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                           {message.sender === "assistant" ? "Assistant" : "You"}
                         </p>
-                        <p className="mt-2">{message.content}</p>
+                        <p className="mt-3 whitespace-pre-wrap text-[1.05rem] leading-9">
+                          {message.content}
+                        </p>
                       </div>
                     ))
                   ) : (
-                    <div className="rounded-2xl bg-card p-4 text-sm text-muted-foreground">
+                    <div className="rounded-3xl bg-card p-5 text-sm text-muted-foreground">
                       Ask the assistant something like "Who am I?" or "What do I need to do today?"
                     </div>
                   )}
@@ -420,7 +422,7 @@ const PatientDashboard = () => {
                           <FormControl>
                             <Textarea
                               {...field}
-                              className="min-h-[110px] rounded-2xl"
+                              className="min-h-[140px] rounded-3xl"
                               placeholder="Who am I? What is planned for today?"
                             />
                           </FormControl>
