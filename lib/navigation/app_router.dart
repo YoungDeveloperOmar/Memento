@@ -22,12 +22,12 @@
 
 import 'package:flutter/material.dart';
 
-import '../features/home/screens/home_screen.dart';
-import '../features/reminders/screens/reminders_screen.dart';
-import '../features/location/screens/location_screen.dart';
-import '../features/memory/screens/memory_screen.dart';
-import '../features/chatbot/screens/chatbot_screen.dart';
-import '../features/caregiver/screens/caregiver_screen.dart';
+import '../features/screens/home/home_screen.dart';
+import '../features/screens/reminders/reminders_screen.dart';
+import '../features/screens/location/location_screen.dart';
+import '../features/screens/memory/memory_screen.dart';
+import '../features/screens/chatbot/chatbot_screen.dart';
+import '../features/screens/caregiver/caregiver_screen.dart';
 import 'bottom_nav_bar.dart';
 
 class MainShell extends StatefulWidget {
