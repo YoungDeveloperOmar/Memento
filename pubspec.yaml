@@ -1,0 +1,33 @@
+name: memento
+description: A dementia support application to help patients stay safe and remember important information.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Google Fonts - Nunito for warm, rounded, highly legible text
+  google_fonts: ^6.1.0
+
+  # Icons
+  cupertino_icons: ^1.0.6
+
+  # Navigation (future-ready)
+  go_router: ^13.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+
+  # Placeholder for future assets (images, audio)
+  # assets:
+  #   - assets/images/
+  #   - assets/audio/
