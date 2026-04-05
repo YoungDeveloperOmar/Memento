@@ -105,14 +105,14 @@ class HomeScreen extends StatelessWidget {
               Text('Coming Up', style: AppTextStyles.headlineSmall),
               const SizedBox(height: AppConstants.spaceM),
 
-              _InfoCard(
+              const _InfoCard(
                 title: 'Next Medication',
                 subtitle: 'Blood Pressure Pill — 2:00 PM',
                 color: AppColors.featureReminders,
                 icon: Icons.medication_rounded,
               ),
               const SizedBox(height: AppConstants.spaceM),
-              _InfoCard(
+              const _InfoCard(
                 title: 'Next Activity',
                 subtitle: 'Doctor Appointment — 4:00 PM',
                 color: AppColors.featureLocation,
@@ -171,7 +171,7 @@ class HomeScreen extends StatelessWidget {
               LargeButton(
                 label: 'Emergency Help',
                 icon: Icons.warning_rounded,
-                backgroundColor: AppColors.error.withOpacity(0.12),
+                backgroundColor: AppColors.error.withValues(alpha: 0.12),
                 foregroundColor: AppColors.error,
                 onPressed: () => _showEmergencySheet(context),
               ),
@@ -229,9 +229,9 @@ class _InfoCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppConstants.cardPadding),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.10),
+        color: color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
-        border: Border.all(color: color.withOpacity(0.25), width: 1.5),
+        border: Border.all(color: color.withValues(alpha: 0.25), width: 1.5),
       ),
       child: Row(
         children: [
@@ -239,7 +239,7 @@ class _InfoCard extends StatelessWidget {
             width: 48,
             height: 48,
             decoration: BoxDecoration(
-              color: color.withOpacity(0.18),
+              color: color.withValues(alpha: 0.18),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 26),
@@ -323,17 +323,17 @@ void _showEmergencySheet(BuildContext context) {
               style: AppTextStyles.headlineSmall),
           const SizedBox(height: 12),
 
-          _EmergencyContactTile(name: 'Sarah (Daughter)', phone: '555-0101'),
+          const _EmergencyContactTile(name: 'Sarah (Daughter)', phone: '555-0101'),
           const SizedBox(height: 10),
-          _EmergencyContactTile(name: 'Dr. James', phone: '555-0202'),
+          const _EmergencyContactTile(name: 'Dr. James', phone: '555-0202'),
 
           const SizedBox(height: 20),
           Text('Important Information',
               style: AppTextStyles.headlineSmall),
           const SizedBox(height: 8),
-          _InfoRow(label: 'Address',   value: '42 Maple Street, Chicago'),
-          _InfoRow(label: 'Caregiver', value: 'Sarah'),
-          _InfoRow(label: 'Doctor',    value: 'Dr. James — City Medical'),
+          const _InfoRow(label: 'Address',   value: '42 Maple Street, Chicago'),
+          const _InfoRow(label: 'Caregiver', value: 'Sarah'),
+          const _InfoRow(label: 'Doctor',    value: 'Dr. James — City Medical'),
         ],
       ),
     ),
@@ -352,7 +352,7 @@ class _EmergencyContactTile extends StatelessWidget {
         color: AppColors.featureCaregiverSurface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-            color: AppColors.featureCaregiver.withOpacity(0.3), width: 1.5),
+            color: AppColors.featureCaregiver.withValues(alpha: 0.3), width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

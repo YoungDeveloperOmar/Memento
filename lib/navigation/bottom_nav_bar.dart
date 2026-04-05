@@ -38,14 +38,14 @@ class MementoBottomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: BoxDecoration(
+      decoration: const BoxDecoration(
         color: AppColors.surface,
         border: Border(top: BorderSide(color: AppColors.divider, width: 1)),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 16,
-            offset: const Offset(0, -2),
+            offset: Offset(0, -2),
           ),
         ],
       ),
@@ -81,7 +81,7 @@ class _Tab extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withOpacity(0.06) : Colors.transparent,
+          color: isSelected ? AppColors.primary.withValues(alpha: 0.06) : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(

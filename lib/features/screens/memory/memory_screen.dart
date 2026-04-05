@@ -127,7 +127,7 @@ class _PersonCard extends StatelessWidget {
             // Avatar
             Container(width: 80, height: 80,
                 decoration: BoxDecoration(
-                    color: AppColors.featureMemory.withOpacity(0.2),
+                    color: AppColors.featureMemory.withValues(alpha: 0.2),
                     shape: BoxShape.circle),
                 child: Center(child: Text(person.emoji,
                     style: const TextStyle(fontSize: 44)))),
@@ -190,7 +190,7 @@ class _PersonCard extends StatelessWidget {
           color: AppColors.featureMemorySurface,
           borderRadius: BorderRadius.circular(AppConstants.radiusL),
           border: Border.all(
-              color: AppColors.featureMemory.withOpacity(0.3), width: 1.5),
+              color: AppColors.featureMemory.withValues(alpha: 0.3), width: 1.5),
         ),
         padding: const EdgeInsets.all(AppConstants.spaceM),
         child: Column(
@@ -199,7 +199,7 @@ class _PersonCard extends StatelessWidget {
             Container(
               width: 64, height: 64,
               decoration: BoxDecoration(
-                  color: AppColors.featureMemory.withOpacity(0.2),
+                  color: AppColors.featureMemory.withValues(alpha: 0.2),
                   shape: BoxShape.circle),
               child: Center(child: Text(person.emoji,
                   style: const TextStyle(fontSize: 36))),
@@ -231,7 +231,7 @@ class _PlaceCard extends StatelessWidget {
     return GestureDetector(
       onTap: () {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('${place.note}',
+          content: Text(place.note,
               style: AppTextStyles.bodySmall.copyWith(color: Colors.white)),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppColors.featureMemory,
@@ -244,7 +244,7 @@ class _PlaceCard extends StatelessWidget {
           color: AppColors.featureMemorySurface,
           borderRadius: BorderRadius.circular(AppConstants.radiusL),
           border: Border.all(
-              color: AppColors.featureMemory.withOpacity(0.3), width: 1.5),
+              color: AppColors.featureMemory.withValues(alpha: 0.3), width: 1.5),
         ),
         padding: const EdgeInsets.all(AppConstants.cardPadding),
         child: Row(
@@ -252,7 +252,7 @@ class _PlaceCard extends StatelessWidget {
             Container(
               width: 52, height: 52,
               decoration: BoxDecoration(
-                  color: AppColors.featureMemory.withOpacity(0.15),
+                  color: AppColors.featureMemory.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(AppConstants.radiusM)),
               child: Icon(place.icon,
                   size: AppConstants.iconL, color: AppColors.featureMemory),
@@ -268,7 +268,7 @@ class _PlaceCard extends StatelessWidget {
                 ],
               ),
             ),
-            Icon(Icons.info_outline_rounded,
+            const Icon(Icons.info_outline_rounded,
                 color: AppColors.featureMemory,
                 size: AppConstants.iconM),
           ],

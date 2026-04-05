@@ -47,7 +47,7 @@ class LargeButton extends StatelessWidget {
       return Container(
         height: 70,
         decoration: BoxDecoration(
-          color: resolvedColor.withOpacity(0.08),
+          color: resolvedColor.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(22),
           border: Border.all(color: resolvedColor, width: 2),
         ),
@@ -86,7 +86,7 @@ class LargeButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: resolvedColor.withOpacity(0.25),
+            color: resolvedColor.withValues(alpha: 0.25),
             blurRadius: 12,
             offset: const Offset(0, 6),
           ),

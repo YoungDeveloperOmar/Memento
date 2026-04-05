@@ -142,13 +142,13 @@ class _ProgressChip extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: done == total
-            ? AppColors.success.withOpacity(0.12)
+            ? AppColors.success.withValues(alpha: 0.12)
             : AppColors.featureRemindersSurface,
         borderRadius: BorderRadius.circular(AppConstants.radiusFull),
         border: Border.all(
           color: done == total
-              ? AppColors.success.withOpacity(0.4)
-              : AppColors.featureReminders.withOpacity(0.3),
+              ? AppColors.success.withValues(alpha: 0.4)
+              : AppColors.featureReminders.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -202,7 +202,7 @@ class _ReminderCard extends StatelessWidget {
           border: Border.all(
             color: reminder.isDone
                 ? AppColors.divider
-                : AppColors.featureReminders.withOpacity(0.3),
+                : AppColors.featureReminders.withValues(alpha: 0.3),
             width: 1.5,
           ),
         ),
@@ -217,7 +217,7 @@ class _ReminderCard extends StatelessWidget {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: AppColors.featureReminders.withOpacity(0.15),
+                    color: AppColors.featureReminders.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(AppConstants.radiusM),
                   ),
                   child: Icon(reminder.icon,
@@ -248,7 +248,7 @@ class _ReminderCard extends StatelessWidget {
                   const Icon(Icons.check_circle_rounded,
                       color: AppColors.success, size: 32)
                 else if (reminder.isSnoozed)
-                  Icon(Icons.snooze_rounded,
+                  const Icon(Icons.snooze_rounded,
                       color: AppColors.warning, size: 32),
               ],
             ),
@@ -289,7 +289,7 @@ class _ReminderCard extends StatelessWidget {
                           foregroundColor: AppColors.featureReminders,
                           minimumSize: Size.zero,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
-                          side: BorderSide(
+                          side: const BorderSide(
                               color: AppColors.featureReminders, width: 1.5),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(14)),

@@ -72,7 +72,7 @@ class _PatientStatusCard extends StatelessWidget {
         ),
         borderRadius: BorderRadius.circular(AppConstants.radiusXL),
         boxShadow: [BoxShadow(
-            color: AppColors.primary.withOpacity(0.3),
+            color: AppColors.primary.withValues(alpha: 0.3),
             blurRadius: 16, offset: const Offset(0, 6))],
       ),
       padding: const EdgeInsets.all(AppConstants.cardPadding + 4),
@@ -91,7 +91,7 @@ class _PatientStatusCard extends StatelessWidget {
                         color: AppColors.white)),
                 Text('Your patient',
                     style: AppTextStyles.bodySmall.copyWith(
-                        color: AppColors.white.withOpacity(0.8))),
+                        color: AppColors.white.withValues(alpha: 0.8))),
               ],
             )),
             Container(width: 12, height: 12,
@@ -103,11 +103,11 @@ class _PatientStatusCard extends StatelessWidget {
           ]),
           const SizedBox(height: AppConstants.spaceL),
           Row(children: [
-            _StatusPill(icon: Icons.shield_rounded, label: 'In safe zone',
-                color: const Color(0xFF6EE7B7)),
+            const _StatusPill(icon: Icons.shield_rounded, label: 'In safe zone',
+                color: Color(0xFF6EE7B7)),
             const SizedBox(width: AppConstants.spaceM),
             _StatusPill(icon: Icons.access_time_rounded, label: 'Last seen 3m ago',
-                color: AppColors.white.withOpacity(0.85)),
+                color: AppColors.white.withValues(alpha: 0.85)),
           ]),
         ],
       ),
@@ -127,7 +127,7 @@ class _StatusPill extends StatelessWidget {
       padding: const EdgeInsets.symmetric(
           horizontal: AppConstants.spaceM, vertical: AppConstants.spaceS),
       decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.2),
+          color: Colors.white.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(AppConstants.radiusFull)),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         Icon(icon, size: 16, color: color),
@@ -186,7 +186,7 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(color: bgColor,
             borderRadius: BorderRadius.circular(AppConstants.radiusL),
-            border: Border.all(color: color.withOpacity(0.3), width: 1.5)),
+            border: Border.all(color: color.withValues(alpha: 0.3), width: 1.5)),
         padding: const EdgeInsets.symmetric(
             horizontal: AppConstants.spaceS, vertical: AppConstants.spaceL),
         child: Column(children: [
@@ -226,7 +226,7 @@ class _AlertCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppConstants.radiusL),
-        border: Border.all(color: _color.withOpacity(0.4), width: 1.5),
+        border: Border.all(color: _color.withValues(alpha: 0.4), width: 1.5),
         boxShadow: const [BoxShadow(
             color: AppColors.shadow, blurRadius: 8, offset: Offset(0, 2))],
       ),
