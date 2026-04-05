@@ -11,6 +11,8 @@ import {
   addMedication as addMedicationRequest,
   addPatient as addPatientRequest,
   addTask as addTaskRequest,
+  deleteMedication as deleteMedicationRequest,
+  deleteTask as deleteTaskRequest,
   getCaregiverDashboard,
   getPatientDashboard,
   loginCaregiver,
@@ -65,12 +67,14 @@ type MementoContextValue = {
   addMedication: (patientId: string, values: MedicationFormValues) => Promise<PatientBundle>;
   addContact: (patientId: string, values: ContactFormInputValues) => Promise<PatientBundle>;
   toggleMedicationStatus: (medicationId: string) => Promise<PatientBundle>;
+  removeMedication: (medicationId: string) => Promise<PatientBundle>;
   addRoutineTask: (
     patientId: string,
     values: TaskFormValues,
     source: "caregiver" | "patient",
   ) => Promise<PatientBundle>;
   toggleRoutineTaskStatus: (taskId: string) => Promise<PatientBundle>;
+  removeRoutineTask: (taskId: string) => Promise<PatientBundle>;
   updateDailySummary: (patientId: string, dailySummary: string) => Promise<PatientBundle>;
   sendCareNoteMessage: (patientId: string, message: string) => Promise<PatientBundle>;
   sendAssistantMessage: (patientId: string, message: string) => Promise<PatientBundle>;
@@ -344,6 +348,17 @@ export const MementoProvider = ({ children }: { children: ReactNode }) => {
     return bundle;
   };
 
+  const removeMedication = async (medicationId: string) => {
+    const bundle = await deleteMedicationRequest(medicationId);
+    applyPatientBundle(bundle);
+
+    if (session?.role === "caregiver") {
+      await refreshCaregiverState(session.caregiverId);
+    }
+
+    return bundle;
+  };
+
   const addRoutineTask = async (
     patientId: string,
     values: TaskFormValues,
@@ -365,6 +380,17 @@ export const MementoProvider = ({ children }: { children: ReactNode }) => {
   const toggleRoutineTaskStatus = async (taskId: string) => {
     const bundle = await toggleTaskRequest(taskId);
     applyPatientBundle(bundle);
+    return bundle;
+  };
+
+  const removeRoutineTask = async (taskId: string) => {
+    const bundle = await deleteTaskRequest(taskId);
+    applyPatientBundle(bundle);
+
+    if (session?.role === "caregiver") {
+      await refreshCaregiverState(session.caregiverId);
+    }
+
     return bundle;
   };
 
@@ -426,8 +452,10 @@ export const MementoProvider = ({ children }: { children: ReactNode }) => {
     addMedication,
     addContact,
     toggleMedicationStatus,
+    removeMedication,
     addRoutineTask,
     toggleRoutineTaskStatus,
+    removeRoutineTask,
     updateDailySummary,
     sendCareNoteMessage,
     sendAssistantMessage,

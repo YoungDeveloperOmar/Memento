@@ -10,6 +10,7 @@ import {
   Pill,
   Plus,
   ShieldAlert,
+  Trash2,
   UserPlus,
   Users,
 } from "lucide-react";
@@ -141,6 +142,8 @@ const CaregiverDashboard = () => {
   const [isPatientDataOpen, setIsPatientDataOpen] = useState(false);
   const [isMedicationOpen, setIsMedicationOpen] = useState(false);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [pendingMedicationDeleteId, setPendingMedicationDeleteId] = useState<string | null>(null);
+  const [pendingTaskDeleteId, setPendingTaskDeleteId] = useState<string | null>(null);
   const {
     currentRole,
     isHydrating,
@@ -155,6 +158,8 @@ const CaregiverDashboard = () => {
     addMedication,
     addContact,
     addRoutineTask,
+    removeMedication,
+    removeRoutineTask,
     sendCareNoteMessage,
   } = useMemento();
 
@@ -354,6 +359,54 @@ const CaregiverDashboard = () => {
       });
     }
   });
+
+  const handleRemoveTask = async (taskId: string, taskTitle: string) => {
+    if (!patient) {
+      return;
+    }
+
+    setPendingTaskDeleteId(taskId);
+
+    try {
+      await removeRoutineTask(taskId);
+      toast({
+        title: "Routine task removed",
+        description: `${taskTitle} was removed from ${patient.name}'s routine.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Unable to remove task",
+        description: error instanceof Error ? error.message : "Task could not be removed.",
+        variant: "destructive",
+      });
+    } finally {
+      setPendingTaskDeleteId(null);
+    }
+  };
+
+  const handleRemoveMedication = async (medicationId: string, medicationName: string) => {
+    if (!patient) {
+      return;
+    }
+
+    setPendingMedicationDeleteId(medicationId);
+
+    try {
+      await removeMedication(medicationId);
+      toast({
+        title: "Medication removed",
+        description: `${medicationName} was removed from ${patient.name}'s schedule.`,
+      });
+    } catch (error) {
+      toast({
+        title: "Unable to remove medication",
+        description: error instanceof Error ? error.message : "Medication could not be removed.",
+        variant: "destructive",
+      });
+    } finally {
+      setPendingMedicationDeleteId(null);
+    }
+  };
 
   const handleCareNoteMessage = careNoteForm.handleSubmit(async (values) => {
     if (!patient) {
@@ -821,17 +874,32 @@ const CaregiverDashboard = () => {
                                       {task.description ? ` • ${task.description}` : ""}
                                     </p>
                                   </div>
-                                  <Badge
-                                    variant={
-                                      task.status === "completed"
-                                        ? "default"
-                                        : "outline"
-                                    }
-                                  >
-                                    {task.status === "completed"
-                                      ? "Completed"
-                                      : "Pending"}
-                                  </Badge>
+                                  <div className="flex items-center gap-2">
+                                    <Badge
+                                      variant={
+                                        task.status === "completed"
+                                          ? "default"
+                                          : "outline"
+                                      }
+                                    >
+                                      {task.status === "completed"
+                                        ? "Completed"
+                                        : "Pending"}
+                                    </Badge>
+                                    <Button
+                                      type="button"
+                                      variant="ghost"
+                                      size="icon"
+                                      className="h-10 w-10 rounded-2xl text-muted-foreground hover:text-destructive"
+                                      disabled={pendingTaskDeleteId === task.id}
+                                      onClick={() => void handleRemoveTask(task.id, task.title)}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                      <span className="sr-only">
+                                        Remove {task.title}
+                                      </span>
+                                    </Button>
+                                  </div>
                                 </div>
                               ))
                             ) : (
@@ -874,17 +942,37 @@ const CaregiverDashboard = () => {
                                 >
                                   <div className="flex items-center justify-between gap-3">
                                     <p className="font-semibold">{medication.name}</p>
-                                    <Badge
-                                      variant={
-                                        medication.status === "taken"
-                                          ? "default"
-                                          : "outline"
-                                      }
-                                    >
-                                      {medication.status === "taken"
-                                        ? "Taken"
-                                        : "Pending"}
-                                    </Badge>
+                                    <div className="flex items-center gap-2">
+                                      <Badge
+                                        variant={
+                                          medication.status === "taken"
+                                            ? "default"
+                                            : "outline"
+                                        }
+                                      >
+                                        {medication.status === "taken"
+                                          ? "Taken"
+                                          : "Pending"}
+                                      </Badge>
+                                      <Button
+                                        type="button"
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-10 w-10 rounded-2xl text-muted-foreground hover:text-destructive"
+                                        disabled={pendingMedicationDeleteId === medication.id}
+                                        onClick={() =>
+                                          void handleRemoveMedication(
+                                            medication.id,
+                                            medication.name,
+                                          )
+                                        }
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                        <span className="sr-only">
+                                          Remove {medication.name}
+                                        </span>
+                                      </Button>
+                                    </div>
                                   </div>
                                   <p className="mt-2 text-sm text-muted-foreground">
                                     {medication.dosage} • {medication.instructions}

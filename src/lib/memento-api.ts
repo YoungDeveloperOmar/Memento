@@ -121,6 +121,11 @@ export const toggleMedication = (medicationId: string) =>
     method: "PATCH",
   });
 
+export const deleteMedication = (medicationId: string) =>
+  requestJson<PatientBundle>(`/api/medications/${medicationId}`, {
+    method: "DELETE",
+  });
+
 export const addTask = (
   patientId: string,
   payload: TaskFormValues & { source: "caregiver" | "patient" },
@@ -133,6 +138,11 @@ export const addTask = (
 export const toggleTask = (taskId: string) =>
   requestJson<PatientBundle>(`/api/tasks/${taskId}/toggle`, {
     method: "PATCH",
+  });
+
+export const deleteTask = (taskId: string) =>
+  requestJson<PatientBundle>(`/api/tasks/${taskId}`, {
+    method: "DELETE",
   });
 
 export const updateDailySummary = (patientId: string, payload: { dailySummary: string }) =>

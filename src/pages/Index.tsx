@@ -17,9 +17,19 @@ import {
 import { useMemento } from "@/context/MementoContext";
 import { toast } from "@/hooks/use-toast";
 import {
-  Pill, Mic, CalendarClock, FileText, ShieldAlert, MapPin,
-  UserPlus, Settings2, Bell, Heart, Users, ArrowRight,
-  Smartphone, Mail, ChevronRight, Clock, Phone
+  ArrowRight,
+  CalendarClock,
+  ChevronRight,
+  FileText,
+  Heart,
+  Mail,
+  MapPin,
+  Mic,
+  Pill,
+  Settings2,
+  ShieldAlert,
+  Smartphone,
+  Users,
 } from "lucide-react";
 import heroImage from "@/assets/hero-illustration.jpg";
 import familyImage from "@/assets/family-connection.jpg";
@@ -44,15 +54,6 @@ const profiles = [
   { title: "Early Support", desc: "Light guidance with gentle reminders and routine suggestions. The interface stays full-featured with optional prompts.", color: "bg-sage" },
   { title: "Middle Support", desc: "More frequent reminders, simplified navigation, and proactive check-ins throughout the day.", color: "bg-sky" },
   { title: "Late Support", desc: "Maximum simplicity with large buttons, voice guidance, and automatic caregiver alerts.", color: "bg-accent" },
-];
-
-const portalCards = [
-  { icon: Clock, title: "Today's Routine", desc: "See meals, appointments, and check-ins for the day at a glance." },
-  { icon: Pill, title: "Medication Reminder", desc: "Track upcoming doses and confirm each medication safely." },
-  { icon: Mic, title: "Voice Guidance", desc: "Replay care prompts and spoken reminders when reassurance helps." },
-  { icon: MapPin, title: "Care Team Access", desc: "Keep key contacts and support details one tap away." },
-  { icon: Phone, title: "Emergency Response", desc: "Send a fast alert to the right people when help is needed." },
-  { icon: FileText, title: "Daily Summary", desc: "Review completed tasks, pending reminders, and care notes." },
 ];
 
 const contactSchema = z.object({
@@ -260,25 +261,6 @@ const Index = () => {
               <Link to="/download">View Mobile Availability</Link>
             </Button>
           </div>
-        </div>
-      </div>
-    </section>
-
-    {/* Portal preview */}
-    <section className="py-20 bg-secondary/30 px-4">
-      <div className="container mx-auto space-y-12">
-        <div className="text-center space-y-4">
-          <h2 className="text-section-sm md:text-section">A peek inside your dashboard</h2>
-          <p className="text-body-lg text-muted-foreground">Simple, friendly, and designed for comfort.</p>
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto">
-          {portalCards.map((c) => (
-            <div key={c.title} className="bg-card rounded-2xl p-6 md:p-8 shadow-sm border space-y-3">
-              <c.icon className="w-8 h-8 text-primary" />
-              <h3 className="text-lg font-heading font-semibold">{c.title}</h3>
-              <p className="text-muted-foreground text-sm md:text-base">{c.desc}</p>
-            </div>
-          ))}
         </div>
       </div>
     </section>

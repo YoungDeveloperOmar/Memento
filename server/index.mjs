@@ -1137,6 +1137,21 @@ const handleRequest = async (request, response) => {
     return;
   }
 
+  const deleteTaskParams = matchPath(pathname, "/api/tasks/:taskId");
+  if (request.method === "DELETE" && deleteTaskParams) {
+    const taskRow = database.prepare("SELECT * FROM routine_tasks WHERE id = ?").get(deleteTaskParams.taskId);
+
+    if (!taskRow) {
+      sendError(response, 404, "Task not found.");
+      return;
+    }
+
+    database.prepare("DELETE FROM routine_tasks WHERE id = ?").run(taskRow.id);
+
+    sendJson(response, 200, buildPatientBundle(taskRow.patient_id));
+    return;
+  }
+
   const toggleMedicationParams = matchPath(pathname, "/api/medications/:medicationId/toggle");
   if (request.method === "PATCH" && toggleMedicationParams) {
     const medicationRow = database
@@ -1152,6 +1167,23 @@ const handleRequest = async (request, response) => {
     database
       .prepare("UPDATE medications SET status = ?, completed_at = ? WHERE id = ?")
       .run(nextStatus, nextStatus === "taken" ? now() : null, medicationRow.id);
+
+    sendJson(response, 200, buildPatientBundle(medicationRow.patient_id));
+    return;
+  }
+
+  const deleteMedicationParams = matchPath(pathname, "/api/medications/:medicationId");
+  if (request.method === "DELETE" && deleteMedicationParams) {
+    const medicationRow = database
+      .prepare("SELECT * FROM medications WHERE id = ?")
+      .get(deleteMedicationParams.medicationId);
+
+    if (!medicationRow) {
+      sendError(response, 404, "Medication not found.");
+      return;
+    }
+
+    database.prepare("DELETE FROM medications WHERE id = ?").run(medicationRow.id);
 
     sendJson(response, 200, buildPatientBundle(medicationRow.patient_id));
     return;
