@@ -3,6 +3,9 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:client": "vite",
@@ -13,7 +16,8 @@
     "preview": "vite preview",
     "start": "node server/index.mjs",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "smoke:api": "node scripts/smoke-api.mjs"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",

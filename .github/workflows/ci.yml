@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
+      - name: Start API server
+        run: |
+          node server/index.mjs --dev > /tmp/memento-api.log 2>&1 &
+          echo $! > /tmp/memento-api.pid
+
+      - name: Smoke test API
+        run: npm run smoke:api
+
+      - name: Stop API server
+        if: always()
+        run: |
+          if [ -f /tmp/memento-api.pid ]; then
+            kill "$(cat /tmp/memento-api.pid)" || true
+          fi
+
+      - name: Upload API log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: memento-api-log
+          path: /tmp/memento-api.log
