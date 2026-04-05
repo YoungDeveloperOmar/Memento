@@ -1,55 +1,72 @@
 // ─────────────────────────────────────────────────────────────
-//  navigation/app_router.dart — MainShell (Navigation Host)
+//  navigation/app_router.dart — MainShell + Route Generator
 //
-//  MainShell is the root widget shown after app launch.
-//  It owns the BottomNavigationBar state and renders
-//  the correct feature screen based on the selected tab.
-//
-//  Architecture notes:
-//    • IndexedStack keeps all screens alive (preserves scroll
-//      position etc.) — appropriate for this simple shell.
-//    • In Phase 2, swap this for go_router + ShellRoute for
-//      deep-linking, push notification navigation, and auth guards.
-//
-//  Screen index map:
+//  Bottom nav tab map:
 //    0 → Home
-//    1 → Reminders
-//    2 → Location
-//    3 → Memory
-//    4 → Chatbot
-//    5 → Caregiver Dashboard
+//    1 → My Medicine (Reminders)
+//    2 → My Memory  (Memory/People)
+//    3 → Ask Memo   (Chatbot)
+//    4 → Caregiver
+//
+//  Named routes (pushed on top of the shell):
+//    /location → LocationScreen
 // ─────────────────────────────────────────────────────────────
 
 import 'package:flutter/material.dart';
-import 'package:memento/features/screens/home/home_screen.dart';
 
-class MainShell extends StatelessWidget {
+import '../features/screens/home/home_screen.dart';
+import '../features/screens/reminders/reminders_screen.dart';
+import '../features/screens/memory/memory_screen.dart';
+import '../features/screens/chatbot/chatbot_screen.dart';
+import '../features/screens/caregiver/caregiver_screen.dart';
+import '../features/screens/location/location_screen.dart';
+import 'bottom_nav_bar.dart';
+
+// ── Named route generator ─────────────────────────────────────
+Route<dynamic> generateRoute(RouteSettings settings) {
+  switch (settings.name) {
+    case '/location':
+      return MaterialPageRoute(
+        builder: (_) => const LocationScreen(),
+        settings: settings,
+      );
+    default:
+      return MaterialPageRoute(
+        builder: (_) => const Scaffold(body: Center(child: Text('Page not found'))),
+      );
+  }
+}
+
+// ── MainShell ─────────────────────────────────────────────────
+class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
   @override
+  State<MainShell> createState() => _MainShellState();
+}
+
+class _MainShellState extends State<MainShell> {
+  int _currentIndex = 0;
+
+  void _onNavTap(int index) => setState(() => _currentIndex = index);
+
+  // IndexedStack keeps screens alive so scroll position is preserved.
+  late final List<Widget> _screens = [
+    HomeScreen(onNavigate: _onNavTap),  // 0 — Home
+    const RemindersScreen(),             // 1 — My Medicine
+    const MemoryScreen(),                // 2 — My Memory
+    const ChatbotScreen(),               // 3 — Ask Memo
+    const CaregiverScreen(),             // 4 — Caregiver
+  ];
+
+  @override
   Widget build(BuildContext context) {
-    return const HomeScreen();
+    return Scaffold(
+      body: IndexedStack(index: _currentIndex, children: _screens),
+      bottomNavigationBar: MementoBottomNavBar(
+        currentIndex: _currentIndex,
+        onTap: _onNavTap,
+      ),
+    );
   }
 }
-// ─────────────────────────────────────────────────────────────
-//  Future: go_router integration
-//
-//  When you add deep linking, replace MainShell with a GoRouter
-//  ShellRoute. Example skeleton:
-//
-//  final router = GoRouter(
-//    routes: [
-//      ShellRoute(
-//        builder: (context, state, child) => MainShell(child: child),
-//        routes: [
-//          GoRoute(path: '/', builder: (_, __) => const HomeScreen(...)),
-//          GoRoute(path: '/reminders', builder: (_, __) => const RemindersScreen()),
-//          GoRoute(path: '/location', builder: (_, __) => const LocationScreen()),
-//          GoRoute(path: '/memory', builder: (_, __) => const MemoryScreen()),
-//          GoRoute(path: '/chatbot', builder: (_, __) => const ChatbotScreen()),
-//          GoRoute(path: '/caregiver', builder: (_, __) => const CaregiverScreen()),
-//        ],
-//      ),
-//    ],
-//  );
-// ─────────────────────────────────────────────────────────────

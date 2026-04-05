@@ -16,7 +16,6 @@ import 'package:memento/core/theme/app_colors.dart';
 import 'package:memento/core/theme/app_text_styles.dart';
 import 'package:memento/core/constants/app_constants.dart';
 
-/// A square card representing a single app feature.
 class FeatureCard extends StatelessWidget {
   const FeatureCard({
     super.key,
@@ -25,21 +24,14 @@ class FeatureCard extends StatelessWidget {
     required this.color,
     required this.backgroundColor,
     required this.onTap,
-    this.badge, // optional notification count
+    this.badge,
   });
 
   final String label;
   final IconData icon;
-
-  /// Icon and badge colour.
   final Color color;
-
-  /// Soft background tint for the card.
   final Color backgroundColor;
-
   final VoidCallback onTap;
-
-  /// Optional badge count (e.g., number of pending reminders).
   final int? badge;
 
   @override
@@ -50,20 +42,18 @@ class FeatureCard extends StatelessWidget {
         duration: AppConstants.animFast,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: BorderRadius.circular(AppConstants.radiusXL),
-          boxShadow: [
-            BoxShadow(
-              color: color.withValues(alpha: 0.15),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
+          borderRadius: BorderRadius.circular(28),
+
+          // softer border instead of heavy shadow
+          border: Border.all(
+            color: color.withValues(alpha: 0.15),
+            width: 1,
+          ),
         ),
-        padding: const EdgeInsets.all(AppConstants.cardPadding),
+        padding: const EdgeInsets.all(28),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ── Icon with optional badge ──────────────────
             Stack(
               clipBehavior: Clip.none,
               children: [
@@ -71,7 +61,7 @@ class FeatureCard extends StatelessWidget {
                   width: 72,
                   height: 72,
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
+                    color: color.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
                   child: Icon(
@@ -105,9 +95,9 @@ class FeatureCard extends StatelessWidget {
                   ),
               ],
             ),
+
             const SizedBox(height: AppConstants.spaceM),
 
-            // ── Label ─────────────────────────────────────
             Text(
               label,
               style: AppTextStyles.headlineSmall.copyWith(color: color),
@@ -122,10 +112,6 @@ class FeatureCard extends StatelessWidget {
   }
 }
 
-// ─────────────────────────────────────────────────────────────
-//  FeatureListTile — a horizontal list-style variant of
-//  FeatureCard, used inside feature screens for sub-actions.
-// ─────────────────────────────────────────────────────────────
 class FeatureListTile extends StatelessWidget {
   const FeatureListTile({
     super.key,
@@ -154,11 +140,13 @@ class FeatureListTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(AppConstants.radiusL),
+          border: Border.all(
+            color: color.withValues(alpha: 0.15),
+          ),
         ),
         padding: const EdgeInsets.all(AppConstants.cardPadding),
         child: Row(
           children: [
-            // Icon
             Container(
               width: 56,
               height: 56,
@@ -170,7 +158,6 @@ class FeatureListTile extends StatelessWidget {
             ),
             const SizedBox(width: AppConstants.spaceM),
 
-            // Text
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -192,7 +179,6 @@ class FeatureListTile extends StatelessWidget {
               ),
             ),
 
-            // Trailing widget / arrow
             trailing ??
                 Icon(
                   Icons.chevron_right_rounded,

@@ -156,8 +156,8 @@ class MementoCard extends StatelessWidget {
         boxShadow: const [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: Offset(0, 2),
+            blurRadius: 12,
+            offset: Offset(0, 4),
           ),
         ],
       ),

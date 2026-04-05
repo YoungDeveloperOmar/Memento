@@ -70,25 +70,6 @@ abstract class AppTheme {
         ),
       ),
 
-      // ── Bottom Navigation Bar ─────────────────────────────
-      bottomNavigationBarTheme: BottomNavigationBarThemeData(
-        backgroundColor: AppColors.surface,
-        selectedItemColor: AppColors.primary,
-        unselectedItemColor: AppColors.textHint,
-        selectedLabelStyle: AppTextStyles.navLabel.copyWith(
-          color: AppColors.primary,
-        ),
-        unselectedLabelStyle: AppTextStyles.navLabel.copyWith(
-          color: AppColors.textHint,
-        ),
-        showSelectedLabels: true,
-        showUnselectedLabels: true,
-        elevation: 12,
-        type: BottomNavigationBarType.fixed,
-        selectedIconTheme: const IconThemeData(size: 30),
-        unselectedIconTheme: const IconThemeData(size: 26),
-      ),
-
       // ── Elevated Button ───────────────────────────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
